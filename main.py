@@ -113,15 +113,21 @@ def main():
             plt.xlabel("Distance (pixels)"); plt.ylabel("Gray Value"); plt.legend(); plt.grid(True)
             plt.savefig(plot_path_1d, dpi=300); plt.close()
 
-            # --- 2D Processing (Surface Plot) ---
-            plot_path_2d = os.path.join(path_structure["2d_surface"]["plots"], "median", f"surface_median_{base_filename}.png")
+            # --- 3D Processing (Surface Plot) ---
+            plot_path_3d = os.path.join(path_structure["2d_surface"]["plots"], "median", f"3d_surface_median_{base_filename}.png")
             filtered_matrix = np.apply_along_axis(medfilt, 0, matrix_intensities, kernel_size=5)
-            plt.figure(figsize=(8, 6))
-            plt.imshow(filtered_matrix, aspect='auto', cmap='viridis', origin='lower')
-            plt.colorbar(label='Gray Value')
-            plt.title(f"2D Surface: Median Filter - {base_filename_with_ext}")
-            plt.xlabel("Line Number"); plt.ylabel("Distance (pixels)")
-            plt.savefig(plot_path_2d, dpi=300); plt.close()
+            
+            fig = plt.figure(figsize=(12, 8))
+            ax = fig.add_subplot(111, projection='3d')
+            rows, cols = filtered_matrix.shape
+            X, Y = np.meshgrid(np.arange(rows), np.arange(cols))
+            Z = filtered_matrix.T
+            surf = ax.plot_surface(X, Y, Z, cmap='viridis', edgecolor='none')
+            fig.colorbar(surf, ax=ax, label='Gray Value', shrink=0.5, aspect=10)
+            ax.set_title(f"3D Surface: Median Filter - {base_filename_with_ext}")
+            ax.set_xlabel("Distance (pixels)"); ax.set_ylabel("Line Number"); ax.set_zlabel("Gray Value")
+            ax.view_init(elev=30, azim=-60)
+            plt.savefig(plot_path_3d, dpi=300); plt.close()
         
         # 2-B. ガウシアンフィルタ処理（全体的な平滑化）
         if RUN_GAUSSIAN_FILTER:
@@ -136,15 +142,21 @@ def main():
             plt.xlabel("Distance (pixels)"); plt.ylabel("Gray Value"); plt.legend(); plt.grid(True)
             plt.savefig(plot_path_1d, dpi=300); plt.close()
 
-            # --- 2D Processing (Surface Plot) ---
-            plot_path_2d = os.path.join(path_structure["2d_surface"]["plots"], "gaussian", f"surface_gaussian_{base_filename}.png")
+            # --- 3D Processing (Surface Plot) ---
+            plot_path_3d = os.path.join(path_structure["2d_surface"]["plots"], "gaussian", f"3d_surface_gaussian_{base_filename}.png")
             filtered_matrix = np.apply_along_axis(gaussian_filter1d, 0, matrix_intensities, sigma=5)
-            plt.figure(figsize=(8, 6))
-            plt.imshow(filtered_matrix, aspect='auto', cmap='viridis', origin='lower')
-            plt.colorbar(label='Gray Value')
-            plt.title(f"2D Surface: Gaussian Filter - {base_filename_with_ext}")
-            plt.xlabel("Line Number"); plt.ylabel("Distance (pixels)")
-            plt.savefig(plot_path_2d, dpi=300); plt.close()
+            
+            fig = plt.figure(figsize=(12, 8))
+            ax = fig.add_subplot(111, projection='3d')
+            rows, cols = filtered_matrix.shape
+            X, Y = np.meshgrid(np.arange(rows), np.arange(cols))
+            Z = filtered_matrix.T
+            surf = ax.plot_surface(X, Y, Z, cmap='viridis', edgecolor='none')
+            fig.colorbar(surf, ax=ax, label='Gray Value', shrink=0.5, aspect=10)
+            ax.set_title(f"3D Surface: Gaussian Filter - {base_filename_with_ext}")
+            ax.set_xlabel("Distance (pixels)"); ax.set_ylabel("Line Number"); ax.set_zlabel("Gray Value")
+            ax.view_init(elev=30, azim=-60)
+            plt.savefig(plot_path_3d, dpi=300); plt.close()
             
         # 2-C. ハイブリッドフィルタ処理（メディアン → ガウシアン）
         if RUN_MEDIAN_GAUSSIAN_FILTER:
@@ -159,16 +171,22 @@ def main():
             plt.xlabel("Distance (pixels)"); plt.ylabel("Gray Value"); plt.legend(); plt.grid(True)
             plt.savefig(plot_path_1d, dpi=300); plt.close()
 
-            # --- 2D Processing (Surface Plot) ---
-            plot_path_2d = os.path.join(path_structure["2d_surface"]["plots"], "median_gaussian", f"surface_median_gaussian_{base_filename}.png")
+            # --- 3D Processing (Surface Plot) ---
+            plot_path_3d = os.path.join(path_structure["2d_surface"]["plots"], "median_gaussian", f"3d_surface_median_gaussian_{base_filename}.png")
             median_filtered_matrix = np.apply_along_axis(medfilt, 0, matrix_intensities, kernel_size=5)
             hybrid_filtered_matrix = np.apply_along_axis(gaussian_filter1d, 0, median_filtered_matrix, sigma=5)
-            plt.figure(figsize=(8, 6))
-            plt.imshow(hybrid_filtered_matrix, aspect='auto', cmap='viridis', origin='lower')
-            plt.colorbar(label='Gray Value')
-            plt.title(f"2D Surface: Hybrid Filter - {base_filename_with_ext}")
-            plt.xlabel("Line Number"); plt.ylabel("Distance (pixels)")
-            plt.savefig(plot_path_2d, dpi=300); plt.close()
+            
+            fig = plt.figure(figsize=(12, 8))
+            ax = fig.add_subplot(111, projection='3d')
+            rows, cols = hybrid_filtered_matrix.shape
+            X, Y = np.meshgrid(np.arange(rows), np.arange(cols))
+            Z = hybrid_filtered_matrix.T
+            surf = ax.plot_surface(X, Y, Z, cmap='viridis', edgecolor='none')
+            fig.colorbar(surf, ax=ax, label='Gray Value', shrink=0.5, aspect=10)
+            ax.set_title(f"3D Surface: Hybrid Filter - {base_filename_with_ext}")
+            ax.set_xlabel("Distance (pixels)"); ax.set_ylabel("Line Number"); ax.set_zlabel("Gray Value")
+            ax.view_init(elev=30, azim=-60)
+            plt.savefig(plot_path_3d, dpi=300); plt.close()
         
     # 3. 機械学習ステップ（将来用）
     if RUN_ML_REGRESSION:
