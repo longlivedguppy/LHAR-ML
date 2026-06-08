@@ -13,12 +13,12 @@ from tqdm import tqdm
 
 def main():
     # --- Interactive Folder Selection ---
-    print("処理モードを選択してください [1: 生画像から処理 (raw), 2: 既存のクリーンデータを使用 (processed)]: ")
+    print("処理モードを選択してください [1: 生画像から処理 (raw), 2: 既存のクリーンデータを使用 (processed), 3: サマリーのみ生成 (summary only)]: ")
     mode = input("> ")
 
     if mode == '1':
         scan_dir = "data/raw"
-    elif mode == '2':
+    elif mode in ('2', '3'):
         scan_dir = "data/processed"
     else:
         print("エラー: 無効なモードが選択されました。プログラムを終了します。")
@@ -56,6 +56,7 @@ def main():
     # 解析・MLの実行コントロールスイッチ (True/False)
     # ==========================================
     RUN_DATA_EXTRACTION = (mode == '1')   # モード1の場合のみ生画像からデータを抽出
+    ONLY_SUMMARY        = (mode == '3')   # サマリー画像のみを出力する
     RUN_MEDIAN_FILTER   = False   # メディアンフィルタによるスパイクノイズ除去を行う
     RUN_GAUSSIAN_FILTER = False   # ガウシアンフィルタによる平滑化を行う
     RUN_MEDIAN_GAUSSIAN_FILTER = False # メディアンフィルタ適用後にガウシアンフィルタをかける
@@ -112,7 +113,7 @@ def main():
             return
         print(f"--- {target_dataset_dir} フォルダ内の {len(target_files)} 個の画像を処理します ---")
         
-    elif mode == '2':
+    elif mode in ('2', '3'):
         # どのフィルタフラグもTrueでない場合、ユーザーに選択を促す
         if not any([RUN_MEDIAN_FILTER, RUN_GAUSSIAN_FILTER, RUN_MEDIAN_GAUSSIAN_FILTER]):
             print("\n読み込むクリーンデータのフィルタタイプを選択してください:")
@@ -154,7 +155,10 @@ def main():
         if not target_files:
              print(f"エラー: {search_dir} 内に処理対象のCSVファイルが見つかりません。事前にモード1で処理を行ってください。")
              return
-        print(f"--- {target_dataset_dir} フォルダ内の {len(target_files)} 個のCSVデータを微分解析します ---")
+        if ONLY_SUMMARY:
+            print(f"--- {target_dataset_dir} フォルダ内の {len(target_files)} 個のCSVデータからサマリー画像を生成します ---")
+        else:
+            print(f"--- {target_dataset_dir} フォルダ内の {len(target_files)} 個のCSVデータを微分解析します ---")
 
     # ==========================================
     # 🏁 実際の解析処理の実行パート (ループ処理)
@@ -266,8 +270,8 @@ def main():
                 ax.view_init(elev=30, azim=-60)
                 plt.savefig(plot_path_3d, dpi=300); plt.close()
 
-        # --- モード2: 既存のフィルタ済みCSVからデータ読み込み ---
-        elif mode == '2':
+        # --- モード2, 3: 既存のフィルタ済みCSVからデータ読み込み ---
+        elif mode in ('2', '3'):
             if RUN_MEDIAN_FILTER:
                 csv_path = os.path.join(path_structure["1d_average"]["data"], "median", f"median_{base_filename}.csv")
                 if os.path.exists(csv_path):
@@ -316,23 +320,47 @@ def main():
                 # --- サマリー用の2D配列とピーク位置をメモリに格納 ---
                 if f_name not in summary_data:
                     summary_data[f_name] = {"intensities": [], "peaks": []}
-                summary_data[f_name]["intensities"].append(intensities)
+                
+                # Min-Max正規化 (0.0〜1.0)
+                int_min, int_max = np.min(intensities), np.max(intensities)
+                if int_max > int_min:
+                    normalized_intensity = (intensities - int_min) / (int_max - int_min)
+                else:
+                    normalized_intensity = np.zeros_like(intensities)  # ゼロ除算回避
+                    
+                summary_data[f_name]["intensities"].append(normalized_intensity)
                 summary_data[f_name]["peaks"].append(best_peak_idx)
                 
-                df_deriv = pd.DataFrame({"Distance": distance, "Intensity": intensities, "Derivative": derivative})
-                df_deriv.to_csv(deriv_csv_path, index=False)
-                
-                plt.figure(figsize=(10, 6))
-                # 解析対象外エリア（0〜START_DISTANCE）に薄いグレーの背景を敷く
-                plt.axvspan(0, START_DISTANCE, color='lightgray', alpha=0.5, label="Ignored Area")
-                
-                plt.plot(distance, abs_derivative, color="orange", linewidth=2, label="Absolute Derivative")
-                # 最も顕著なピークを赤点でマーキング
-                plt.plot(distance[best_peak_idx], best_peak_val, "ro", markersize=8, label=f"Max Peak (Distance={distance[best_peak_idx]})")
-                
-                plt.title(f"1D Derivative: {f_title} - {base_filename}")
-                plt.xlabel("Distance (pixels)"); plt.ylabel("Absolute Derivative"); plt.legend(); plt.grid(True)
-                plt.savefig(deriv_plot_path, dpi=300); plt.close()
+                if not ONLY_SUMMARY:
+                    df_deriv = pd.DataFrame({"Distance": distance, "Intensity": intensities, "Derivative": derivative})
+                    df_deriv.to_csv(deriv_csv_path, index=False)
+                    
+                    fig, ax1 = plt.subplots(figsize=(10, 6))
+                    
+                    # 解析対象外エリア（0〜START_DISTANCE）に薄いグレーの背景を敷く
+                    ax1.axvspan(0, START_DISTANCE, color='lightgray', alpha=0.5, label="Ignored Area")
+                    
+                    # 左側のY軸：微分値 (Absolute Derivative)
+                    ax1.set_xlabel("Distance (pixels)")
+                    ax1.set_ylabel("Absolute Derivative", color="tab:orange")
+                    line1 = ax1.plot(distance, abs_derivative, color="tab:orange", linewidth=2, label="Absolute Derivative")
+                    peak1 = ax1.plot(distance[best_peak_idx], best_peak_val, "ro", markersize=8, label=f"Max Peak (Distance={distance[best_peak_idx]})")
+                    ax1.tick_params(axis='y', labelcolor="tab:orange")
+                    ax1.grid(True)
+                    
+                    # 右側のY軸：輝度値 (Intensity)
+                    ax2 = ax1.twinx()
+                    ax2.set_ylabel("Intensity", color="tab:blue")
+                    line2 = ax2.plot(distance, intensities, color="tab:blue", linewidth=2, alpha=0.5, linestyle="--", label="Intensity")
+                    ax2.tick_params(axis='y', labelcolor="tab:blue")
+                    
+                    # 凡例をまとめる
+                    lines = line1 + peak1 + line2
+                    labels = [l.get_label() for l in lines]
+                    ax1.legend(lines, labels, loc="upper right")
+                    
+                    plt.title(f"1D Derivative & Intensity: {f_title} - {base_filename}")
+                    plt.savefig(deriv_plot_path, dpi=300); plt.close()
 
     # ==========================================
     # 全角度微分サマリーヒートマップの生成と保存
@@ -347,7 +375,7 @@ def main():
             plt.figure(figsize=(12, 8))
             # aspect='auto' とすることで、行数(61)と列数(761)の比率をよしなに画面幅に合わせてくれます
             plt.imshow(intensities_matrix, aspect='auto', cmap='viridis')
-            plt.colorbar(label='Gray Value')
+            plt.colorbar(label='Normalized Gray Value (0.0 - 1.0)')
             
             # 解析対象外エリア（0〜START_DISTANCE）に薄いグレーのマスクを敷く
             plt.axvspan(0, START_DISTANCE, color='lightgray', alpha=0.5, label="Ignored Area")
@@ -355,7 +383,7 @@ def main():
             # 検出した各ピークのDistance位置を赤線（点群）として重ねる
             plt.plot(peaks_array, y_indices, color='red', marker='o', markersize=3, linestyle='-', linewidth=1.5, label='Detected Boundary (Peaks)')
             
-            plt.title(f"All Angles Summary Heatmap: {f_name} Intensity")
+            plt.title(f"All Angles Summary Heatmap: {f_name} Normalized Intensity")
             plt.xlabel("Distance (pixels)")
             plt.ylabel("Image Index (Angle)")
             plt.legend()
