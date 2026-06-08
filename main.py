@@ -70,6 +70,7 @@ def main():
     N_LINES = 5
     LINE_GAP = 4
     START_DISTANCE = 50  # 微分解析の開始位置（ピクセル数）
+    TOLERANCE_PX = 40.0  # 全体中央値からの許容ズレ幅（ピクセル）
 
     # 入力パス設定
     raw_dir = os.path.join("data", "raw", target_dataset_dir)
@@ -93,7 +94,7 @@ def main():
     roi_coords = {"x1": 509, "y1": 142, "x2": 509, "y2": 903}
     
     # 必要な全フォルダを自動生成
-    filter_types = ["median", "gaussian", "median_gaussian", "derivative"]
+    filter_types = ["median", "gaussian", "median_gaussian", "derivative", os.path.join("derivative", "raw"), os.path.join("derivative", "corrected")]
     for proc_type, paths in path_structure.items():
         for category, base_path in paths.items():
             for filter_type in filter_types:
@@ -309,17 +310,35 @@ def main():
                 abs_derivative_clipped = abs_derivative.copy()
                 abs_derivative_clipped[:START_DISTANCE] = 0
                 
-                # scipy.signal.find_peaks を用いて最も顕著なピークを自動検出
-                peaks, properties = find_peaks(abs_derivative_clipped, height=0)
-                if len(peaks) > 0:
-                    best_peak_idx = peaks[np.argmax(properties['peak_heights'])]
+                # scipy.signal.find_peaks を用いて独立した上位2つのピークを取得
+                peaks, properties = find_peaks(abs_derivative_clipped, height=0, distance=15)
+                if len(peaks) >= 2:
+                    sorted_idx = np.argsort(properties['peak_heights'])[::-1]
+                    p1_x = peaks[sorted_idx[0]]
+                    p1_v = properties['peak_heights'][sorted_idx[0]]
+                    p2_x = peaks[sorted_idx[1]]
+                    p2_v = properties['peak_heights'][sorted_idx[1]]
+                elif len(peaks) == 1:
+                    p1_x = peaks[0]
+                    p1_v = properties['peak_heights'][0]
+                    p2_x = p1_x
+                    p2_v = 0
                 else:
-                    best_peak_idx = np.argmax(abs_derivative_clipped) # フォールバック
-                best_peak_val = abs_derivative[best_peak_idx]
+                    p1_x = np.argmax(abs_derivative_clipped)
+                    p1_v = abs_derivative[p1_x]
+                    p2_x = p1_x
+                    p2_v = 0
                 
+                # 個別プロット用は1stピークを使用
+                best_peak_idx = p1_x
+                best_peak_val = p1_v
+
                 # --- サマリー用の2D配列とピーク位置をメモリに格納 ---
                 if f_name not in summary_data:
-                    summary_data[f_name] = {"intensities": [], "peaks": []}
+                    summary_data[f_name] = {
+                        "intensities": [], "p1_x": [], "p1_v": [], "p2_x": [], "p2_v": [],
+                        "base_filenames": [], "distances": [], "abs_derivs": [], "raw_intensities": [], "f_titles": []
+                    }
                 
                 # Min-Max正規化 (0.0〜1.0)
                 int_min, int_max = np.min(intensities), np.max(intensities)
@@ -329,69 +348,192 @@ def main():
                     normalized_intensity = np.zeros_like(intensities)  # ゼロ除算回避
                     
                 summary_data[f_name]["intensities"].append(normalized_intensity)
-                summary_data[f_name]["peaks"].append(best_peak_idx)
+                summary_data[f_name]["p1_x"].append(p1_x)
+                summary_data[f_name]["p1_v"].append(p1_v)
+                summary_data[f_name]["p2_x"].append(p2_x)
+                summary_data[f_name]["p2_v"].append(p2_v)
+                summary_data[f_name]["base_filenames"].append(base_filename)
+                summary_data[f_name]["distances"].append(distance)
+                summary_data[f_name]["abs_derivs"].append(abs_derivative)
+                summary_data[f_name]["raw_intensities"].append(intensities)
+                summary_data[f_name]["f_titles"].append(f_title)
                 
                 if not ONLY_SUMMARY:
                     df_deriv = pd.DataFrame({"Distance": distance, "Intensity": intensities, "Derivative": derivative})
                     df_deriv.to_csv(deriv_csv_path, index=False)
-                    
-                    fig, ax1 = plt.subplots(figsize=(10, 6))
-                    
-                    # 解析対象外エリア（0〜START_DISTANCE）に薄いグレーの背景を敷く
-                    ax1.axvspan(0, START_DISTANCE, color='lightgray', alpha=0.5, label="Ignored Area")
-                    
-                    # 左側のY軸：微分値 (Absolute Derivative)
-                    ax1.set_xlabel("Distance (pixels)")
-                    ax1.set_ylabel("Absolute Derivative", color="tab:orange")
-                    line1 = ax1.plot(distance, abs_derivative, color="tab:orange", linewidth=2, label="Absolute Derivative")
-                    peak1 = ax1.plot(distance[best_peak_idx], best_peak_val, "ro", markersize=8, label=f"Max Peak (Distance={distance[best_peak_idx]})")
-                    ax1.tick_params(axis='y', labelcolor="tab:orange")
-                    ax1.grid(True)
-                    
-                    # 右側のY軸：輝度値 (Intensity)
-                    ax2 = ax1.twinx()
-                    ax2.set_ylabel("Intensity", color="tab:blue")
-                    line2 = ax2.plot(distance, intensities, color="tab:blue", linewidth=2, alpha=0.5, linestyle="--", label="Intensity")
-                    ax2.tick_params(axis='y', labelcolor="tab:blue")
-                    
-                    # 凡例をまとめる
-                    lines = line1 + peak1 + line2
-                    labels = [l.get_label() for l in lines]
-                    ax1.legend(lines, labels, loc="upper right")
-                    
-                    plt.title(f"1D Derivative & Intensity: {f_title} - {base_filename}")
-                    plt.savefig(deriv_plot_path, dpi=300); plt.close()
 
     # ==========================================
     # 全角度微分サマリーヒートマップの生成と保存
     # ==========================================
     if RUN_DERIVATIVE_ANALYSIS and summary_data:
-        print("\n[サマリー生成] 全角度サマリーヒートマップを生成・保存中...")
+        print("\n[サマリー生成] 全体統計ベースの一括検疫・補間とヒートマップ生成を実行中...")
         for f_name, data in summary_data.items():
             intensities_matrix = np.array(data["intensities"])  # Shape: [num_images, 761]
-            peaks_array = np.array(data["peaks"])     # Shape: [num_images]
-            y_indices = np.arange(len(peaks_array))
+            p1_x = np.array(data["p1_x"], dtype=float)
+            p1_v = np.array(data["p1_v"], dtype=float)
+            p2_x = np.array(data["p2_x"], dtype=float)
+            p2_v = np.array(data["p2_v"], dtype=float)
+            y_indices = np.arange(len(p1_x))
             
+            # --- 全体中央値の計算 (アンカー) ---
+            median_1st_x = np.median(p1_x)
+            dynamic_min_threshold = np.median(p1_v) * 0.5
+            
+            # --- 一括検疫 & 2次ピーク救済 ---
+            final_peaks = np.full(len(p1_x), np.nan)
+            status = np.zeros(len(p1_x), dtype=int)
+            
+            for i in range(len(p1_x)):
+                if abs(p1_x[i] - median_1st_x) <= TOLERANCE_PX and p1_v[i] >= dynamic_min_threshold:
+                    final_peaks[i] = p1_x[i]
+                    status[i] = 1  # Case 1: Pure
+                elif abs(p2_x[i] - median_1st_x) <= TOLERANCE_PX and p2_v[i] >= dynamic_min_threshold:
+                    final_peaks[i] = p2_x[i]
+                    status[i] = 2  # Case 2: Recovered
+                else:
+                    status[i] = 3  # Case 3: Missing
+            
+            # --- スプライン補間 (NaNの補完) ---
+            peaks_series = pd.Series(final_peaks)
+            if peaks_series.notna().sum() > 3: # スプライン補間には最低限のデータ数が必要
+                corrected_boundary = peaks_series.interpolate(method='cubic').bfill().ffill().values
+            else:
+                corrected_boundary = peaks_series.interpolate(method='linear').bfill().ffill().values
+            
+            # --- 個別グラフのプロット (全体統計ベースでの分岐プロット) ---
+            if not ONLY_SUMMARY:
+                print(f"  -> 個別画像のプロットを生成中 ({f_name})...")
+                for i in range(len(p1_x)):
+                    b_name = data["base_filenames"][i]
+                    dist = data["distances"][i]
+                    a_deriv = data["abs_derivs"][i]
+                    r_int = data["raw_intensities"][i]
+                    f_titl = data["f_titles"][i]
+                    stat = status[i]
+                    c_bound = corrected_boundary[i]
+                    p1_xi, p1_vi = p1_x[i], p1_v[i]
+                    p2_xi, p2_vi = p2_x[i], p2_v[i]
+                    
+                    deriv_plot_path_raw = os.path.join(path_structure["1d_average"]["plots"], "derivative", "raw", f"deriv_{f_name}_{b_name}.png")
+                    deriv_plot_path_corrected = os.path.join(path_structure["1d_average"]["plots"], "derivative", "corrected", f"deriv_{f_name}_{b_name}.png")
+                    
+                    # --- 1. Raw Plot (補間・検疫なしのありのままのピーク) ---
+                    fig_raw, ax1_raw = plt.subplots(figsize=(10, 6))
+                    ax1_raw.axvspan(0, START_DISTANCE, color='lightgray', alpha=0.5, label="Ignored Area")
+                    ax1_raw.set_xlabel("Distance (pixels)")
+                    ax1_raw.set_ylabel("Absolute Derivative", color="tab:orange")
+                    line1_raw = ax1_raw.plot(dist, a_deriv, color="tab:orange", linewidth=2, label="Absolute Derivative")
+                    peaks_plots_raw = ax1_raw.plot(p1_xi, p1_vi, "ro", markersize=8, label="Max Peak (Raw 1st Peak)")
+                    ax1_raw.tick_params(axis='y', labelcolor="tab:orange")
+                    ax1_raw.grid(True)
+                    
+                    ax2_raw = ax1_raw.twinx()
+                    ax2_raw.set_ylabel("Intensity", color="tab:blue")
+                    line2_raw = ax2_raw.plot(dist, r_int, color="tab:blue", linewidth=2, alpha=0.5, linestyle="--", label="Intensity")
+                    ax2_raw.tick_params(axis='y', labelcolor="tab:blue")
+                    
+                    lines_raw = line1_raw + peaks_plots_raw + line2_raw
+                    labels_raw = [l.get_label() for l in lines_raw]
+                    ax1_raw.legend(lines_raw, labels_raw, loc="upper right")
+                    plt.title(f"1D Derivative & Intensity: {f_titl} - {b_name} (Raw)")
+                    plt.savefig(deriv_plot_path_raw, dpi=300); plt.close()
+
+                    # --- 2. Corrected Plot (検疫と補間を反映したプロット) ---
+                    fig, ax1 = plt.subplots(figsize=(10, 6))
+                    ax1.axvspan(0, START_DISTANCE, color='lightgray', alpha=0.5, label="Ignored Area")
+                    ax1.set_xlabel("Distance (pixels)")
+                    ax1.set_ylabel("Absolute Derivative", color="tab:orange")
+                    line1 = ax1.plot(dist, a_deriv, color="tab:orange", linewidth=2, label="Absolute Derivative")
+                    
+                    peaks_plots = []
+                    title_suffix = ""
+                    if stat == 1:
+                        peaks_plots += ax1.plot(p1_xi, p1_vi, "ro", markersize=8, label="Max Peak (Case 1)")
+                    elif stat == 2:
+                        peaks_plots += ax1.plot(p1_xi, p1_vi, marker="x", color="tab:orange", markersize=8, linestyle="None", label="Rejected 1st Peak")
+                        peaks_plots += ax1.plot(p2_xi, p2_vi, "go", markersize=8, label="Recovered 2nd Peak")
+                    elif stat == 3:
+                        title_suffix = " [Interpolated]"
+                        peaks_plots += ax1.plot(p1_xi, p1_vi, marker="x", color="gray", markersize=8, linestyle="None", label="Rejected 1st Peak")
+                        if p2_xi != p1_xi:
+                            peaks_plots += ax1.plot(p2_xi, p2_vi, marker="x", color="gray", markersize=8, linestyle="None", label="Rejected 2nd Peak")
+                        
+                        idx_bound = int(round(c_bound))
+                        val_bound = a_deriv[idx_bound] if 0 <= idx_bound < len(a_deriv) else 0
+                        peaks_plots += ax1.plot(c_bound, val_bound, marker="o", color="tab:blue", markersize=8, linestyle="None", label="Interpolated Boundary")
+                        ax1.axvline(median_1st_x, color="tab:blue", linestyle="--", alpha=0.5, label="Anchor X")
+
+                    ax1.tick_params(axis='y', labelcolor="tab:orange")
+                    ax1.grid(True)
+                    
+                    ax2 = ax1.twinx()
+                    ax2.set_ylabel("Intensity", color="tab:blue")
+                    line2 = ax2.plot(dist, r_int, color="tab:blue", linewidth=2, alpha=0.5, linestyle="--", label="Intensity")
+                    ax2.tick_params(axis='y', labelcolor="tab:blue")
+                    
+                    lines = line1 + peaks_plots + line2
+                    labels = [l.get_label() for l in lines]
+                    ax1.legend(lines, labels, loc="upper right")
+                    
+                    plt.title(f"1D Derivative & Intensity: {f_titl} - {b_name}{title_suffix} (Corrected)")
+                    plt.savefig(deriv_plot_path_corrected, dpi=300); plt.close()
+            
+            # ==================================
+            # サマリー1: 補間なし (Raw 1st Peaks)
+            # ==================================
             plt.figure(figsize=(12, 8))
-            # aspect='auto' とすることで、行数(61)と列数(761)の比率をよしなに画面幅に合わせてくれます
+            plt.imshow(intensities_matrix, aspect='auto', cmap='viridis')
+            plt.colorbar(label='Normalized Gray Value (0.0 - 1.0)')
+            
+            plt.axvspan(0, START_DISTANCE, color='lightgray', alpha=0.5, label="Ignored Area")
+            
+            # ありのままの1次ピークを赤色の細い実線で繋ぐ
+            plt.plot(p1_x, y_indices, color='red', linestyle='-', linewidth=1.5, marker='', label='Raw 1st Peaks')
+            
+            plt.title(f"All Angles Summary Heatmap: Raw 1st Peaks (Uncorrected) - {f_name}")
+            plt.xlabel("Distance (pixels)")
+            plt.ylabel("Image Index (Angle)")
+            plt.legend()
+            
+            raw_summary_plot_path = os.path.join(path_structure["1d_average"]["plots"], "derivative", "raw", f"summary_all_angles_raw_peaks_{f_name}.png")
+            plt.savefig(raw_summary_plot_path, dpi=300)
+            plt.close()
+            print(f"  -> Rawサマリー画像を保存しました: {raw_summary_plot_path}")
+
+            # ==================================
+            # サマリー2: 3色色分け＆補間線付き (Corrected)
+            # ==================================
+            plt.figure(figsize=(12, 8))
             plt.imshow(intensities_matrix, aspect='auto', cmap='viridis')
             plt.colorbar(label='Normalized Gray Value (0.0 - 1.0)')
             
             # 解析対象外エリア（0〜START_DISTANCE）に薄いグレーのマスクを敷く
             plt.axvspan(0, START_DISTANCE, color='lightgray', alpha=0.5, label="Ignored Area")
             
-            # 検出した各ピークのDistance位置を赤線（点群）として重ねる
-            plt.plot(peaks_array, y_indices, color='red', marker='o', markersize=3, linestyle='-', linewidth=1.5, label='Detected Boundary (Peaks)')
+            # 下敷きとしてスプライン補間後のなめらかな最終境界線を白色の実線で繋ぐ
+            plt.plot(corrected_boundary, y_indices, color='white', linestyle='-', linewidth=1, alpha=0.8, zorder=1)
             
-            plt.title(f"All Angles Summary Heatmap: {f_name} Normalized Intensity")
+            # 信頼度に基づく3色シグナル色分けプロット
+            idx1 = (status == 1)
+            idx2 = (status == 2)
+            idx3 = (status == 3)
+            
+            if np.any(idx1):
+                plt.scatter(corrected_boundary[idx1], y_indices[idx1], color='red', marker='o', s=20, label='Pure (Case 1)', zorder=2)
+            if np.any(idx2):
+                plt.scatter(corrected_boundary[idx2], y_indices[idx2], color='green', marker='o', s=20, label='Recovered (Case 2)', zorder=2)
+            if np.any(idx3):
+                plt.scatter(corrected_boundary[idx3], y_indices[idx3], color='blue', marker='x', s=30, label='Missing/Interpolated (Case 3)', zorder=2)
+            
+            plt.title(f"All Angles Summary Heatmap: {f_name} Normalized Intensity (Corrected)\n(Anchor X: {median_1st_x:.1f}, Thresh: {dynamic_min_threshold:.1f})")
             plt.xlabel("Distance (pixels)")
             plt.ylabel("Image Index (Angle)")
             plt.legend()
             
-            summary_plot_path = os.path.join(path_structure["1d_average"]["plots"], "derivative", f"summary_all_angles_intensity_{f_name}.png")
-            plt.savefig(summary_plot_path, dpi=300)
+            corrected_summary_plot_path = os.path.join(path_structure["1d_average"]["plots"], "derivative", "corrected", f"summary_all_angles_corrected_3colors_{f_name}.png")
+            plt.savefig(corrected_summary_plot_path, dpi=300)
             plt.close()
-            print(f"  -> サマリー画像を保存しました: {summary_plot_path}")
+            print(f"  -> Correctedサマリー画像を保存しました: {corrected_summary_plot_path}")
 
     # 3. 機械学習ステップ（将来用）
     if RUN_ML_REGRESSION:
