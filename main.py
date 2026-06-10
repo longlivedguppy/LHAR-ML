@@ -1,5 +1,6 @@
 import os
 import glob
+import cv2
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -13,11 +14,13 @@ from tqdm import tqdm
 
 def main():
     # --- Interactive Folder Selection ---
-    print("処理モードを選択してください [1: 生画像から処理 (raw), 2: 既存のクリーンデータを使用 (processed), 3: サマリーのみ生成 (summary only)]: ")
+    print("処理モードを選択してください [1: 生画像から処理 (raw), 2: 既存のクリーンデータを使用 (processed), 3: サマリーのみ生成 (summary only), 4: 画像のエンハンス (enhance), 5: エンハンス画像から処理 (enhanced)]: ")
     mode = input("> ")
 
-    if mode == '1':
+    if mode in ('1', '4'):
         scan_dir = "data/raw"
+    elif mode == '5':
+        scan_dir = "data/enhanced"
     elif mode in ('2', '3'):
         scan_dir = "data/processed"
     else:
@@ -53,13 +56,42 @@ def main():
         return
 
     # ==========================================
+    # モード4: 画像のエンハンス処理のみ実行して終了
+    # ==========================================
+    if mode == '4':
+        raw_dir = os.path.join("data", "raw", target_dataset_dir)
+        enhanced_dir = os.path.join("data", "enhanced", target_dataset_dir)
+        os.makedirs(enhanced_dir, exist_ok=True)
+        
+        img_files = glob.glob(os.path.join(raw_dir, "*.tiff")) + glob.glob(os.path.join(raw_dir, "*.tif"))
+        if not img_files:
+            print(f"エラー: {raw_dir} 内に画像が見つかりません。")
+            return
+            
+        print(f"\n--- {target_dataset_dir} フォルダ内の {len(img_files)} 個の画像をエンハンスします ---")
+        for img_path in tqdm(img_files, desc="Enhancing Images"):
+            img = cv2.imread(img_path, cv2.IMREAD_UNCHANGED)
+            if img is None: continue
+            
+            # 線形コントラストストレッチ (Min-Max正規化)
+            if img.dtype == np.uint16:
+                enhanced_img = cv2.normalize(img, None, alpha=0, beta=65535, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_16U)
+            else:
+                enhanced_img = cv2.normalize(img, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U)
+                
+            cv2.imwrite(os.path.join(enhanced_dir, os.path.basename(img_path)), enhanced_img)
+            
+        print(f"\nエンハンス処理が完了しました。画像は '{enhanced_dir}' に保存されました。")
+        return
+
+    # ==========================================
     # 解析・MLの実行コントロールスイッチ (True/False)
     # ==========================================
-    RUN_DATA_EXTRACTION = (mode == '1')   # モード1の場合のみ生画像からデータを抽出
+    RUN_DATA_EXTRACTION = (mode in ('1', '5'))   # モード1または5の場合に画像からデータを抽出
     ONLY_SUMMARY        = (mode == '3')   # サマリー画像のみを出力する
     RUN_MEDIAN_FILTER   = False   # メディアンフィルタによるスパイクノイズ除去を行う
     RUN_GAUSSIAN_FILTER = False   # ガウシアンフィルタによる平滑化を行う
-    RUN_MEDIAN_GAUSSIAN_FILTER = False # メディアンフィルタ適用後にガウシアンフィルタをかける
+    RUN_MEDIAN_GAUSSIAN_FILTER = True # メディアンフィルタ適用後にガウシアンフィルタをかける
     RUN_DERIVATIVE_ANALYSIS = True   # 微分解析とグラフ出力を行う
     RUN_ML_REGRESSION   = False  # 【今後実装】機械学習による膜厚・深さ予測
     RUN_EDGE_DETECTION  = False  # 【今後実装】製膜境界（端）の自動検出
@@ -67,13 +99,16 @@ def main():
     # ==========================================
     # 処理パラメータとパスの設定
     # ==========================================
-    N_LINES = 5
-    LINE_GAP = 4
+    N_LINES = 21  # ノイズ耐性を上げるために本数を増やす (奇数がおすすめ)
+    LINE_GAP = 10 # 隙間なく連続した幅として取得する
     START_DISTANCE = 50  # 微分解析の開始位置（ピクセル数）
-    TOLERANCE_PX = 40.0  # 全体中央値からの許容ズレ幅（ピクセル）
+    TOLERANCE_PX = 50.0  # 全体中央値からの許容ズレ幅（ピクセル）
 
     # 入力パス設定
-    raw_dir = os.path.join("data", "raw", target_dataset_dir)
+    if mode == '5':
+        raw_dir = os.path.join("data", "enhanced", target_dataset_dir)
+    else:
+        raw_dir = os.path.join("data", "raw", target_dataset_dir)
     
     # 出力パスの動的生成
     base_processed_dir = os.path.join("data", "processed", target_dataset_dir, f"{N_LINES}lines")
@@ -91,7 +126,7 @@ def main():
     
     # ImageJの長方形選択（Width: 7, Height: 761, X: 506, Y: 142）に基づく座標
     # x1がサンプリング開始X座標となる
-    roi_coords = {"x1": 509, "y1": 142, "x2": 509, "y2": 903}
+    roi_coords = {"x1": 878, "y1": 1400, "x2": 878, "y2": 200}
     
     # 必要な全フォルダを自動生成
     filter_types = ["median", "gaussian", "median_gaussian", "derivative", os.path.join("derivative", "raw"), os.path.join("derivative", "corrected")]
@@ -105,7 +140,7 @@ def main():
     # ==========================================
     target_files = [] # (img_path, base_filename)のリスト
     
-    if mode == '1':
+    if mode in ('1', '5'):
         img_files = glob.glob(os.path.join(raw_dir, "*.tiff")) + glob.glob(os.path.join(raw_dir, "*.tif"))
         for f in img_files:
             target_files.append((f, os.path.splitext(os.path.basename(f))[0]))
@@ -178,8 +213,8 @@ def main():
         clean_intensities = None
         hybrid_intensities = None
 
-        # --- モード1: 生画像からデータ抽出とフィルタリング ---
-        if mode == '1':
+        # --- モード1, 5: 画像からデータ抽出とフィルタリング ---
+        if mode in ('1', '5'):
             if RUN_DATA_EXTRACTION:
                 try:
                     avg_intensities, matrix_intensities = extract_multi_line_profile(
@@ -188,7 +223,7 @@ def main():
                     tqdm.write(f"\nエラー: {e}")
                     continue
             
-            if avg_intensities is None:
+            if avg_intensities is None or len(avg_intensities) == 0:
                 tqdm.write(f"\nスキップ ({base_filename}): 輝度データがありません。")
                 continue 
 
@@ -299,6 +334,10 @@ def main():
                 active_filters.append(("median_gaussian", hybrid_intensities, "Hybrid Filter"))
                 
             for f_name, intensities, f_title in active_filters:
+                if len(intensities) < 2:
+                    tqdm.write(f"\n警告: {base_filename} ({f_name}) のデータポイントが不足しているため、微分解析をスキップします。")
+                    continue
+
                 deriv_csv_path = os.path.join(path_structure["1d_average"]["data"], "derivative", f"deriv_{f_name}_{base_filename}.csv")
                 deriv_plot_path = os.path.join(path_structure["1d_average"]["plots"], "derivative", f"deriv_{f_name}_{base_filename}.png")
                 
