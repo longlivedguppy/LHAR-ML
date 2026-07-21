@@ -1,0 +1,6 @@
+method,images,noise_mad_median,noise_mad_mean,rmse_from_raw_median,images_with_candidate,candidate_rate,candidate_position_median,candidate_position_std,total_candidates,interpretation
+Raw,61,201.6336,200.2725245901639,0.0,61,1.0,506.0,70.14560431624463,445,candidate_only_not_PD
+Median+Gaussian,61,10.672248820337515,10.602770158309404,341.3149406489175,61,1.0,506.0,12.135688117908098,505,candidate_only_not_PD
+Huber MRF lambda=0.1,61,173.43980718086186,175.52105752734838,34.89224785984874,61,1.0,506.0,70.14866158273418,516,candidate_only_not_PD
+Huber MRF lambda=1,61,86.28210182370734,86.14428969801897,148.7071979104663,61,1.0,506.0,85.30454162167806,593,candidate_only_not_PD
+Huber MRF lambda=10,61,22.76358754136642,22.605228835437693,270.62635945413297,61,1.0,506.0,0.2743147627980576,551,candidate_only_not_PD
