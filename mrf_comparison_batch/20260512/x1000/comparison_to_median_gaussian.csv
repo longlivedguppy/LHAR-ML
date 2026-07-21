@@ -1,0 +1,6 @@
+method,comparable_images,median_absolute_candidate_shift_px,mean_absolute_candidate_shift_px,within_5px,within_10px,within_50px,over_50px,interpretation
+Raw,56,146.0,264.44642857142856,5,7,14,42,agreement_with_filter_candidate_not_PD_accuracy
+Median+Gaussian,59,0.0,0.0,59,59,59,0,agreement_with_filter_candidate_not_PD_accuracy
+Huber MRF lambda=0.1,57,136.0,238.2280701754386,5,8,16,41,agreement_with_filter_candidate_not_PD_accuracy
+Huber MRF lambda=1,58,16.5,157.1206896551724,18,22,33,25,agreement_with_filter_candidate_not_PD_accuracy
+Huber MRF lambda=10,59,2.0,38.67796610169491,37,42,51,8,agreement_with_filter_candidate_not_PD_accuracy

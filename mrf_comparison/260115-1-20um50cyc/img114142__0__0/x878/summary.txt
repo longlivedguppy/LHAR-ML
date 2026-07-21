@@ -1,0 +1,13 @@
+Preliminary Huber MRF comparison
+No detected derivative candidate in this report is automatically a PD boundary.
+
+Raw: noise_MAD=201.634, main_candidate_position=undetectable, significant_peaks=0, RMSE_from_raw=0
+Median+Gaussian: noise_MAD=13.7881, main_candidate_position=338, significant_peaks=1, RMSE_from_raw=416.647
+Huber MRF lambda=0.1: noise_MAD=180.165, main_candidate_position=918, significant_peaks=2, RMSE_from_raw=43.1547
+Huber MRF lambda=1: noise_MAD=89.4345, main_candidate_position=undetectable, significant_peaks=0, RMSE_from_raw=174.247
+Huber MRF lambda=10: noise_MAD=26.3542, main_candidate_position=810, significant_peaks=2, RMSE_from_raw=292.313
+
+MRF convergence:
+Huber MRF lambda=0.1: delta=0.325394, iterations=9, converged=True
+Huber MRF lambda=1: delta=0.325394, iterations=23, converged=True
+Huber MRF lambda=10: delta=0.325394, iterations=127, converged=True

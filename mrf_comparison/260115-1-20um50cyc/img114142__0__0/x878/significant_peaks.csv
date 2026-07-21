@@ -1,0 +1,6 @@
+method,rank_by_prominence,position,height,prominence,width,raw_local_peak_support,raw_support_distance,artificial_peak_suspect,interpretation
+Median+Gaussian,1,338,43.436453231362975,43.422181295736664,11.63655412944587,True,1,False,candidate_only_not_PD
+Huber MRF lambda=0.1,1,918,544.1204683791366,543.1243708515212,1.2849002928655864,True,0,False,candidate_only_not_PD
+Huber MRF lambda=0.1,2,675,534.7817360697009,533.6068600136387,2.998176519087565,True,0,False,candidate_only_not_PD
+Huber MRF lambda=10,1,810,79.35741088368377,79.1534319002676,3.8540226675135045,True,0,False,candidate_only_not_PD
+Huber MRF lambda=10,2,416,77.49650918168845,77.31006967737267,4.124951861571674,True,0,False,candidate_only_not_PD

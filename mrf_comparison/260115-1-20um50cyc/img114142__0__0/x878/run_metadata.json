@@ -1,0 +1,88 @@
+{
+  "scope": "preliminary single-image single-line comparison; no PD classification",
+  "image": "data\\raw\\260115-1-20um50cyc\\img114142_  0_  0.tiff",
+  "image_line": {
+    "x": 878,
+    "y_start": 1400,
+    "y_end": 200,
+    "samples": 1201
+  },
+  "median_gaussian": {
+    "median_kernel": 5,
+    "gaussian_sigma": 5.0
+  },
+  "peak_assessment": {
+    "start_distance": 50,
+    "minimum_prominence_noise_factor": 5.0,
+    "argmax_fallback": false
+  },
+  "mrf": {
+    "Huber MRF lambda=0.1": {
+      "regularization": 0.1,
+      "huber_delta_normalized": 0.3253937333177886,
+      "robust_center": 46848.0,
+      "robust_scale_p95_minus_p5": 1248.0,
+      "iterations": 9,
+      "converged": true,
+      "relative_change": 3.3358715575849036e-08
+    },
+    "Huber MRF lambda=1": {
+      "regularization": 1.0,
+      "huber_delta_normalized": 0.3253937333177886,
+      "robust_center": 46848.0,
+      "robust_scale_p95_minus_p5": 1248.0,
+      "iterations": 23,
+      "converged": true,
+      "relative_change": 9.472779890250978e-08
+    },
+    "Huber MRF lambda=10": {
+      "regularization": 10.0,
+      "huber_delta_normalized": 0.3253937333177886,
+      "robust_center": 46848.0,
+      "robust_scale_p95_minus_p5": 1248.0,
+      "iterations": 127,
+      "converged": true,
+      "relative_change": 9.545753532179989e-08
+    }
+  },
+  "significant_peaks": {
+    "Raw": [],
+    "Median+Gaussian": [
+      {
+        "position": 338,
+        "height": 43.436453231362975,
+        "prominence": 43.422181295736664,
+        "width": 11.63655412944587
+      }
+    ],
+    "Huber MRF lambda=0.1": [
+      {
+        "position": 918,
+        "height": 544.1204683791366,
+        "prominence": 543.1243708515212,
+        "width": 1.2849002928655864
+      },
+      {
+        "position": 675,
+        "height": 534.7817360697009,
+        "prominence": 533.6068600136387,
+        "width": 2.998176519087565
+      }
+    ],
+    "Huber MRF lambda=1": [],
+    "Huber MRF lambda=10": [
+      {
+        "position": 810,
+        "height": 79.35741088368377,
+        "prominence": 79.1534319002676,
+        "width": 3.8540226675135045
+      },
+      {
+        "position": 416,
+        "height": 77.49650918168845,
+        "prominence": 77.31006967737267,
+        "width": 4.124951861571674
+      }
+    ]
+  }
+}

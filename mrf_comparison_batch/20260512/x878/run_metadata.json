@@ -1,0 +1,2588 @@
+{
+  "scope": "all TIFFs, one vertical line per image; candidates are not PD classifications",
+  "dataset": "20260512",
+  "image_count": 61,
+  "angles_deg": [
+    0,
+    6,
+    12,
+    18,
+    24,
+    30,
+    36,
+    42,
+    48,
+    54,
+    60,
+    66,
+    72,
+    78,
+    84,
+    90,
+    96,
+    102,
+    108,
+    114,
+    120,
+    126,
+    132,
+    138,
+    144,
+    150,
+    156,
+    162,
+    168,
+    174,
+    180,
+    186,
+    192,
+    198,
+    204,
+    210,
+    216,
+    222,
+    228,
+    234,
+    240,
+    246,
+    252,
+    258,
+    264,
+    270,
+    276,
+    282,
+    288,
+    294,
+    300,
+    306,
+    312,
+    318,
+    324,
+    330,
+    336,
+    342,
+    348,
+    354,
+    360
+  ],
+  "line": {
+    "x": 878,
+    "y_start": 1400,
+    "y_end": 200
+  },
+  "median_gaussian": {
+    "median_kernel": 5,
+    "gaussian_sigma": 5.0
+  },
+  "mrf_regularization": [
+    0.1,
+    1.0,
+    10.0
+  ],
+  "start_distance": 50,
+  "peak_noise_factor": 5.0,
+  "argmax_fallback": false,
+  "runs": [
+    {
+      "angle_deg": 0,
+      "image_index": 0,
+      "image": "data\\raw\\20260512\\img134327_  0_  0.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.09427589754071593,
+          "iterations": 8,
+          "converged": true,
+          "relative_change": 8.145320625022543e-08,
+          "robust_center": 51264.0,
+          "robust_scale": 5504.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.09427589754071593,
+          "iterations": 18,
+          "converged": true,
+          "relative_change": 5.710759673567304e-08,
+          "robust_center": 51264.0,
+          "robust_scale": 5504.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.09427589754071593,
+          "iterations": 8,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 51264.0,
+          "robust_scale": 5504.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 5,
+        "Median+Gaussian": 9,
+        "Huber MRF lambda=0.1": 5,
+        "Huber MRF lambda=1": 5,
+        "Huber MRF lambda=10": 7
+      }
+    },
+    {
+      "angle_deg": 6,
+      "image_index": 1,
+      "image": "data\\raw\\20260512\\img134334_  1_  6.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.09824045773665478,
+          "iterations": 8,
+          "converged": true,
+          "relative_change": 9.96077797104211e-08,
+          "robust_center": 45776.0,
+          "robust_scale": 3904.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.09824045773665478,
+          "iterations": 20,
+          "converged": true,
+          "relative_change": 9.235557508214772e-08,
+          "robust_center": 45776.0,
+          "robust_scale": 3904.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.09824045773665478,
+          "iterations": 5,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 45776.0,
+          "robust_scale": 3904.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 4,
+        "Median+Gaussian": 5,
+        "Huber MRF lambda=0.1": 6,
+        "Huber MRF lambda=1": 4,
+        "Huber MRF lambda=10": 6
+      }
+    },
+    {
+      "angle_deg": 12,
+      "image_index": 2,
+      "image": "data\\raw\\20260512\\img134338_  2_ 12.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.10949170445604882,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 2.390571912579986e-08,
+          "robust_center": 47968.0,
+          "robust_scale": 4224.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.10949170445604882,
+          "iterations": 23,
+          "converged": true,
+          "relative_change": 8.420203101419869e-08,
+          "robust_center": 47968.0,
+          "robust_scale": 4224.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.10949170445604882,
+          "iterations": 5,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 47968.0,
+          "robust_scale": 4224.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 8,
+        "Median+Gaussian": 3,
+        "Huber MRF lambda=0.1": 5,
+        "Huber MRF lambda=1": 5,
+        "Huber MRF lambda=10": 2
+      }
+    },
+    {
+      "angle_deg": 18,
+      "image_index": 3,
+      "image": "data\\raw\\20260512\\img134343_  3_ 18.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.10477073766269351,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 3.046981333864081e-08,
+          "robust_center": 49968.0,
+          "robust_scale": 5168.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.10477073766269351,
+          "iterations": 23,
+          "converged": true,
+          "relative_change": 8.586695941282907e-08,
+          "robust_center": 49968.0,
+          "robust_scale": 5168.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.10477073766269351,
+          "iterations": 6,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 49968.0,
+          "robust_scale": 5168.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 6,
+        "Median+Gaussian": 9,
+        "Huber MRF lambda=0.1": 7,
+        "Huber MRF lambda=1": 4,
+        "Huber MRF lambda=10": 7
+      }
+    },
+    {
+      "angle_deg": 24,
+      "image_index": 4,
+      "image": "data\\raw\\20260512\\img134348_  4_ 24.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.20314128548935392,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 6.021560631935878e-08,
+          "robust_center": 45904.0,
+          "robust_scale": 1888.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.20314128548935392,
+          "iterations": 20,
+          "converged": true,
+          "relative_change": 7.712287157964261e-08,
+          "robust_center": 45904.0,
+          "robust_scale": 1888.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.20314128548935392,
+          "iterations": 4,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 45904.0,
+          "robust_scale": 1888.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 2,
+        "Median+Gaussian": 5,
+        "Huber MRF lambda=0.1": 2,
+        "Huber MRF lambda=1": 2,
+        "Huber MRF lambda=10": 4
+      }
+    },
+    {
+      "angle_deg": 30,
+      "image_index": 5,
+      "image": "data\\raw\\20260512\\img134353_  5_ 30.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.30793966333139383,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 8.266576788847236e-08,
+          "robust_center": 46224.0,
+          "robust_scale": 1392.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.30793966333139383,
+          "iterations": 24,
+          "converged": true,
+          "relative_change": 8.948354312896744e-08,
+          "robust_center": 46224.0,
+          "robust_scale": 1392.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.30793966333139383,
+          "iterations": 5,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 46224.0,
+          "robust_scale": 1392.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 2,
+        "Median+Gaussian": 5,
+        "Huber MRF lambda=0.1": 2,
+        "Huber MRF lambda=1": 3,
+        "Huber MRF lambda=10": 5
+      }
+    },
+    {
+      "angle_deg": 36,
+      "image_index": 6,
+      "image": "data\\raw\\20260512\\img134357_  6_ 36.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.10631250281679072,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 2.444051918541801e-08,
+          "robust_center": 47008.0,
+          "robust_scale": 4032.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.10631250281679072,
+          "iterations": 18,
+          "converged": true,
+          "relative_change": 7.320076977922092e-08,
+          "robust_center": 47008.0,
+          "robust_scale": 4032.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.10631250281679072,
+          "iterations": 4,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 47008.0,
+          "robust_scale": 4032.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 6,
+        "Median+Gaussian": 3,
+        "Huber MRF lambda=0.1": 7,
+        "Huber MRF lambda=1": 7,
+        "Huber MRF lambda=10": 5
+      }
+    },
+    {
+      "angle_deg": 42,
+      "image_index": 7,
+      "image": "data\\raw\\20260512\\img134402_  7_ 42.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.07243353652622006,
+          "iterations": 8,
+          "converged": true,
+          "relative_change": 5.5777453826198854e-08,
+          "robust_center": 40272.0,
+          "robust_scale": 4672.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.07243353652622006,
+          "iterations": 18,
+          "converged": true,
+          "relative_change": 5.7835249287669354e-08,
+          "robust_center": 40272.0,
+          "robust_scale": 4672.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.07243353652622006,
+          "iterations": 3,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 40272.0,
+          "robust_scale": 4672.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 4,
+        "Median+Gaussian": 4,
+        "Huber MRF lambda=0.1": 2,
+        "Huber MRF lambda=1": 8,
+        "Huber MRF lambda=10": 3
+      }
+    },
+    {
+      "angle_deg": 48,
+      "image_index": 8,
+      "image": "data\\raw\\20260512\\img134407_  8_ 48.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.1864515055925621,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 3.712181048317688e-08,
+          "robust_center": 43264.0,
+          "robust_scale": 1936.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.1864515055925621,
+          "iterations": 21,
+          "converged": true,
+          "relative_change": 8.677882037631979e-08,
+          "robust_center": 43264.0,
+          "robust_scale": 1936.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.1864515055925621,
+          "iterations": 4,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 43264.0,
+          "robust_scale": 1936.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 12,
+        "Median+Gaussian": 5,
+        "Huber MRF lambda=0.1": 10,
+        "Huber MRF lambda=1": 12,
+        "Huber MRF lambda=10": 10
+      }
+    },
+    {
+      "angle_deg": 54,
+      "image_index": 9,
+      "image": "data\\raw\\20260512\\img134412_  9_ 54.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.14369829411910837,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 2.6371645478751587e-08,
+          "robust_center": 43360.0,
+          "robust_scale": 2512.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.14369829411910837,
+          "iterations": 18,
+          "converged": true,
+          "relative_change": 5.766361433463108e-08,
+          "robust_center": 43360.0,
+          "robust_scale": 2512.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.14369829411910837,
+          "iterations": 3,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 43360.0,
+          "robust_scale": 2512.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 2,
+        "Median+Gaussian": 2,
+        "Huber MRF lambda=0.1": 4,
+        "Huber MRF lambda=1": 2,
+        "Huber MRF lambda=10": 4
+      }
+    },
+    {
+      "angle_deg": 60,
+      "image_index": 10,
+      "image": "data\\raw\\20260512\\img134416_ 10_ 60.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.09855114862133747,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 2.2091672000025062e-08,
+          "robust_center": 40432.0,
+          "robust_scale": 2976.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.09855114862133747,
+          "iterations": 19,
+          "converged": true,
+          "relative_change": 6.113131993982895e-08,
+          "robust_center": 40432.0,
+          "robust_scale": 2976.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.09855114862133747,
+          "iterations": 3,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 40432.0,
+          "robust_scale": 2976.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 1,
+        "Median+Gaussian": 2,
+        "Huber MRF lambda=0.1": 1,
+        "Huber MRF lambda=1": 2,
+        "Huber MRF lambda=10": 5
+      }
+    },
+    {
+      "angle_deg": 66,
+      "image_index": 11,
+      "image": "data\\raw\\20260512\\img134421_ 11_ 66.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.19766909033323607,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 5.6735085476614655e-08,
+          "robust_center": 42736.0,
+          "robust_scale": 1712.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.19766909033323607,
+          "iterations": 20,
+          "converged": true,
+          "relative_change": 6.8688298632103e-08,
+          "robust_center": 42736.0,
+          "robust_scale": 1712.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.19766909033323607,
+          "iterations": 3,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 42736.0,
+          "robust_scale": 1712.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 3,
+        "Median+Gaussian": 2,
+        "Huber MRF lambda=0.1": 8,
+        "Huber MRF lambda=1": 4,
+        "Huber MRF lambda=10": 3
+      }
+    },
+    {
+      "angle_deg": 72,
+      "image_index": 12,
+      "image": "data\\raw\\20260512\\img134426_ 12_ 72.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.12135585955704407,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 3.3426396846603745e-08,
+          "robust_center": 48544.0,
+          "robust_scale": 3904.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.12135585955704407,
+          "iterations": 24,
+          "converged": true,
+          "relative_change": 9.917623643883645e-08,
+          "robust_center": 48544.0,
+          "robust_scale": 3904.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.12135585955704407,
+          "iterations": 4,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 48544.0,
+          "robust_scale": 3904.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 2,
+        "Median+Gaussian": 5,
+        "Huber MRF lambda=0.1": 2,
+        "Huber MRF lambda=1": 5,
+        "Huber MRF lambda=10": 7
+      }
+    },
+    {
+      "angle_deg": 78,
+      "image_index": 13,
+      "image": "data\\raw\\20260512\\img134430_ 13_ 78.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.15754631408310069,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 3.911394963675899e-08,
+          "robust_center": 48528.0,
+          "robust_scale": 2864.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.15754631408310069,
+          "iterations": 27,
+          "converged": true,
+          "relative_change": 8.564065958018541e-08,
+          "robust_center": 48528.0,
+          "robust_scale": 2864.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.15754631408310069,
+          "iterations": 5,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 48528.0,
+          "robust_scale": 2864.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 2,
+        "Median+Gaussian": 3,
+        "Huber MRF lambda=0.1": 4,
+        "Huber MRF lambda=1": 3,
+        "Huber MRF lambda=10": 4
+      }
+    },
+    {
+      "angle_deg": 84,
+      "image_index": 14,
+      "image": "data\\raw\\20260512\\img134435_ 14_ 84.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.18676020013824515,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 3.932787143614366e-08,
+          "robust_center": 48400.0,
+          "robust_scale": 2416.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.18676020013824515,
+          "iterations": 24,
+          "converged": true,
+          "relative_change": 9.794335345095506e-08,
+          "robust_center": 48400.0,
+          "robust_scale": 2416.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.18676020013824515,
+          "iterations": 6,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 48400.0,
+          "robust_scale": 2416.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 8,
+        "Median+Gaussian": 5,
+        "Huber MRF lambda=0.1": 8,
+        "Huber MRF lambda=1": 5,
+        "Huber MRF lambda=10": 6
+      }
+    },
+    {
+      "angle_deg": 90,
+      "image_index": 15,
+      "image": "data\\raw\\20260512\\img134440_ 15_ 90.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.09652056176787589,
+          "iterations": 8,
+          "converged": true,
+          "relative_change": 9.50406880733104e-08,
+          "robust_center": 52624.0,
+          "robust_scale": 5376.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.09652056176787589,
+          "iterations": 21,
+          "converged": true,
+          "relative_change": 7.83779585389387e-08,
+          "robust_center": 52624.0,
+          "robust_scale": 5376.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.09652056176787589,
+          "iterations": 27,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 52624.0,
+          "robust_scale": 5376.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 2,
+        "Median+Gaussian": 6,
+        "Huber MRF lambda=0.1": 4,
+        "Huber MRF lambda=1": 4,
+        "Huber MRF lambda=10": 7
+      }
+    },
+    {
+      "angle_deg": 96,
+      "image_index": 16,
+      "image": "data\\raw\\20260512\\img134445_ 16_ 96.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.1751601877072982,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 3.394285906373147e-08,
+          "robust_center": 48528.0,
+          "robust_scale": 2576.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.1751601877072982,
+          "iterations": 24,
+          "converged": true,
+          "relative_change": 8.600956923993592e-08,
+          "robust_center": 48528.0,
+          "robust_scale": 2576.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.1751601877072982,
+          "iterations": 4,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 48528.0,
+          "robust_scale": 2576.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 2,
+        "Median+Gaussian": 4,
+        "Huber MRF lambda=0.1": 5,
+        "Huber MRF lambda=1": 7,
+        "Huber MRF lambda=10": 4
+      }
+    },
+    {
+      "angle_deg": 102,
+      "image_index": 17,
+      "image": "data\\raw\\20260512\\img134449_ 17_102.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.1480541486595938,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 4.0186103230373734e-08,
+          "robust_center": 48912.0,
+          "robust_scale": 3200.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.1480541486595938,
+          "iterations": 18,
+          "converged": true,
+          "relative_change": 9.398365552340778e-08,
+          "robust_center": 48912.0,
+          "robust_scale": 3200.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.1480541486595938,
+          "iterations": 6,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 48912.0,
+          "robust_scale": 3200.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 5,
+        "Median+Gaussian": 5,
+        "Huber MRF lambda=0.1": 5,
+        "Huber MRF lambda=1": 6,
+        "Huber MRF lambda=10": 6
+      }
+    },
+    {
+      "angle_deg": 108,
+      "image_index": 18,
+      "image": "data\\raw\\20260512\\img134454_ 18_108.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.11703885269533107,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 3.35331088022595e-08,
+          "robust_center": 47888.0,
+          "robust_scale": 4048.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.11703885269533107,
+          "iterations": 18,
+          "converged": true,
+          "relative_change": 7.401767478920761e-08,
+          "robust_center": 47888.0,
+          "robust_scale": 4048.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.11703885269533107,
+          "iterations": 6,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 47888.0,
+          "robust_scale": 4048.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 6,
+        "Median+Gaussian": 8,
+        "Huber MRF lambda=0.1": 6,
+        "Huber MRF lambda=1": 5,
+        "Huber MRF lambda=10": 6
+      }
+    },
+    {
+      "angle_deg": 114,
+      "image_index": 19,
+      "image": "data\\raw\\20260512\\img134459_ 19_114.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.207358751624081,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 5.578670936177598e-08,
+          "robust_center": 42240.0,
+          "robust_scale": 1632.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.207358751624081,
+          "iterations": 19,
+          "converged": true,
+          "relative_change": 5.7709842013976204e-08,
+          "robust_center": 42240.0,
+          "robust_scale": 1632.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.207358751624081,
+          "iterations": 3,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 42240.0,
+          "robust_scale": 1632.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 2,
+        "Median+Gaussian": 2,
+        "Huber MRF lambda=0.1": 5,
+        "Huber MRF lambda=1": 5,
+        "Huber MRF lambda=10": 4
+      }
+    },
+    {
+      "angle_deg": 120,
+      "image_index": 20,
+      "image": "data\\raw\\20260512\\img134504_ 20_120.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.09536499108508459,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 2.2141212478195016e-08,
+          "robust_center": 41072.0,
+          "robust_scale": 3312.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.09536499108508459,
+          "iterations": 19,
+          "converged": true,
+          "relative_change": 6.753585779660332e-08,
+          "robust_center": 41072.0,
+          "robust_scale": 3312.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.09536499108508459,
+          "iterations": 3,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 41072.0,
+          "robust_scale": 3312.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 2,
+        "Median+Gaussian": 3,
+        "Huber MRF lambda=0.1": 4,
+        "Huber MRF lambda=1": 1,
+        "Huber MRF lambda=10": 6
+      }
+    },
+    {
+      "angle_deg": 126,
+      "image_index": 21,
+      "image": "data\\raw\\20260512\\img134508_ 21_126.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.1335826905199343,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 2.4698121399333196e-08,
+          "robust_center": 45776.0,
+          "robust_scale": 3040.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.1335826905199343,
+          "iterations": 25,
+          "converged": true,
+          "relative_change": 9.962634142235104e-08,
+          "robust_center": 45776.0,
+          "robust_scale": 3040.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.1335826905199343,
+          "iterations": 5,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 45776.0,
+          "robust_scale": 3040.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 8,
+        "Median+Gaussian": 3,
+        "Huber MRF lambda=0.1": 7,
+        "Huber MRF lambda=1": 5,
+        "Huber MRF lambda=10": 3
+      }
+    },
+    {
+      "angle_deg": 132,
+      "image_index": 22,
+      "image": "data\\raw\\20260512\\img134513_ 22_132.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.17173558147327725,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 3.903257597086687e-08,
+          "robust_center": 45856.0,
+          "robust_scale": 2496.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.17173558147327725,
+          "iterations": 19,
+          "converged": true,
+          "relative_change": 6.959614009184914e-08,
+          "robust_center": 45856.0,
+          "robust_scale": 2496.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.17173558147327725,
+          "iterations": 4,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 45856.0,
+          "robust_scale": 2496.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 5,
+        "Median+Gaussian": 4,
+        "Huber MRF lambda=0.1": 7,
+        "Huber MRF lambda=1": 4,
+        "Huber MRF lambda=10": 3
+      }
+    },
+    {
+      "angle_deg": 138,
+      "image_index": 23,
+      "image": "data\\raw\\20260512\\img134518_ 23_138.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.07409443290516525,
+          "iterations": 8,
+          "converged": true,
+          "relative_change": 8.308985845413245e-08,
+          "robust_center": 44144.0,
+          "robust_scale": 5024.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.07409443290516525,
+          "iterations": 16,
+          "converged": true,
+          "relative_change": 8.250326507253937e-08,
+          "robust_center": 44144.0,
+          "robust_scale": 5024.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.07409443290516525,
+          "iterations": 4,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 44144.0,
+          "robust_scale": 5024.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 6,
+        "Median+Gaussian": 3,
+        "Huber MRF lambda=0.1": 6,
+        "Huber MRF lambda=1": 8,
+        "Huber MRF lambda=10": 5
+      }
+    },
+    {
+      "angle_deg": 144,
+      "image_index": 24,
+      "image": "data\\raw\\20260512\\img134522_ 24_144.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.11432752792246631,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 2.02834959437848e-08,
+          "robust_center": 49424.0,
+          "robust_scale": 4144.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.11432752792246631,
+          "iterations": 22,
+          "converged": true,
+          "relative_change": 7.284148868901888e-08,
+          "robust_center": 49424.0,
+          "robust_scale": 4144.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.11432752792246631,
+          "iterations": 6,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 49424.0,
+          "robust_scale": 4144.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 7,
+        "Median+Gaussian": 7,
+        "Huber MRF lambda=0.1": 8,
+        "Huber MRF lambda=1": 5,
+        "Huber MRF lambda=10": 2
+      }
+    },
+    {
+      "angle_deg": 150,
+      "image_index": 25,
+      "image": "data\\raw\\20260512\\img134527_ 25_150.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.28200790220875016,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 8.558073346257608e-08,
+          "robust_center": 46736.0,
+          "robust_scale": 1600.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.28200790220875016,
+          "iterations": 25,
+          "converged": true,
+          "relative_change": 8.149604449229966e-08,
+          "robust_center": 46736.0,
+          "robust_scale": 1600.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.28200790220875016,
+          "iterations": 4,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 46736.0,
+          "robust_scale": 1600.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 5,
+        "Median+Gaussian": 5,
+        "Huber MRF lambda=0.1": 5,
+        "Huber MRF lambda=1": 7,
+        "Huber MRF lambda=10": 8
+      }
+    },
+    {
+      "angle_deg": 156,
+      "image_index": 26,
+      "image": "data\\raw\\20260512\\img134532_ 26_156.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.1328833047056938,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 3.165982810300509e-08,
+          "robust_center": 46288.0,
+          "robust_scale": 3056.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.1328833047056938,
+          "iterations": 19,
+          "converged": true,
+          "relative_change": 9.740962092568003e-08,
+          "robust_center": 46288.0,
+          "robust_scale": 3056.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.1328833047056938,
+          "iterations": 4,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 46288.0,
+          "robust_scale": 3056.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 4,
+        "Median+Gaussian": 6,
+        "Huber MRF lambda=0.1": 5,
+        "Huber MRF lambda=1": 4,
+        "Huber MRF lambda=10": 6
+      }
+    },
+    {
+      "angle_deg": 162,
+      "image_index": 27,
+      "image": "data\\raw\\20260512\\img134537_ 27_162.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.10491365409551717,
+          "iterations": 8,
+          "converged": true,
+          "relative_change": 9.142170244197986e-08,
+          "robust_center": 51504.0,
+          "robust_scale": 5376.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.10491365409551717,
+          "iterations": 19,
+          "converged": true,
+          "relative_change": 8.663918597952601e-08,
+          "robust_center": 51504.0,
+          "robust_scale": 5376.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.10491365409551717,
+          "iterations": 6,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 51504.0,
+          "robust_scale": 5376.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 3,
+        "Median+Gaussian": 5,
+        "Huber MRF lambda=0.1": 4,
+        "Huber MRF lambda=1": 8,
+        "Huber MRF lambda=10": 5
+      }
+    },
+    {
+      "angle_deg": 168,
+      "image_index": 28,
+      "image": "data\\raw\\20260512\\img134541_ 28_168.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.12112674213811955,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 3.47206330903554e-08,
+          "robust_center": 47232.0,
+          "robust_scale": 3632.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.12112674213811955,
+          "iterations": 19,
+          "converged": true,
+          "relative_change": 7.740087206619472e-08,
+          "robust_center": 47232.0,
+          "robust_scale": 3632.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.12112674213811955,
+          "iterations": 4,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 47232.0,
+          "robust_scale": 3632.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 6,
+        "Median+Gaussian": 5,
+        "Huber MRF lambda=0.1": 5,
+        "Huber MRF lambda=1": 5,
+        "Huber MRF lambda=10": 5
+      }
+    },
+    {
+      "angle_deg": 174,
+      "image_index": 29,
+      "image": "data\\raw\\20260512\\img134546_ 29_174.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.10716300283932505,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 2.5612743972087614e-08,
+          "robust_center": 46480.0,
+          "robust_scale": 4000.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.10716300283932505,
+          "iterations": 22,
+          "converged": true,
+          "relative_change": 8.793582558197364e-08,
+          "robust_center": 46480.0,
+          "robust_scale": 4000.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.10716300283932505,
+          "iterations": 5,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 46480.0,
+          "robust_scale": 4000.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 9,
+        "Median+Gaussian": 6,
+        "Huber MRF lambda=0.1": 9,
+        "Huber MRF lambda=1": 9,
+        "Huber MRF lambda=10": 7
+      }
+    },
+    {
+      "angle_deg": 180,
+      "image_index": 30,
+      "image": "data\\raw\\20260512\\img134551_ 30_180.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.0901769454737282,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 2.3177799776304296e-08,
+          "robust_center": 50944.0,
+          "robust_scale": 5504.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.0901769454737282,
+          "iterations": 24,
+          "converged": true,
+          "relative_change": 7.075909342330119e-08,
+          "robust_center": 50944.0,
+          "robust_scale": 5504.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.0901769454737282,
+          "iterations": 40,
+          "converged": true,
+          "relative_change": 8.900722083480443e-08,
+          "robust_center": 50944.0,
+          "robust_scale": 5504.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 5,
+        "Median+Gaussian": 5,
+        "Huber MRF lambda=0.1": 7,
+        "Huber MRF lambda=1": 4,
+        "Huber MRF lambda=10": 7
+      }
+    },
+    {
+      "angle_deg": 186,
+      "image_index": 31,
+      "image": "data\\raw\\20260512\\img134556_ 31_186.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.10444737118842601,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 2.289090684033145e-08,
+          "robust_center": 45904.0,
+          "robust_scale": 3888.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.10444737118842601,
+          "iterations": 20,
+          "converged": true,
+          "relative_change": 6.600933997407388e-08,
+          "robust_center": 45904.0,
+          "robust_scale": 3888.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.10444737118842601,
+          "iterations": 4,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 45904.0,
+          "robust_scale": 3888.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 4,
+        "Median+Gaussian": 5,
+        "Huber MRF lambda=0.1": 5,
+        "Huber MRF lambda=1": 2,
+        "Huber MRF lambda=10": 5
+      }
+    },
+    {
+      "angle_deg": 192,
+      "image_index": 32,
+      "image": "data\\raw\\20260512\\img134600_ 32_192.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.10304134888396639,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 2.229003828130048e-08,
+          "robust_center": 46784.0,
+          "robust_scale": 4160.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.10304134888396639,
+          "iterations": 21,
+          "converged": true,
+          "relative_change": 7.39195769083666e-08,
+          "robust_center": 46784.0,
+          "robust_scale": 4160.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.10304134888396639,
+          "iterations": 5,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 46784.0,
+          "robust_scale": 4160.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 3,
+        "Median+Gaussian": 4,
+        "Huber MRF lambda=0.1": 4,
+        "Huber MRF lambda=1": 5,
+        "Huber MRF lambda=10": 6
+      }
+    },
+    {
+      "angle_deg": 198,
+      "image_index": 33,
+      "image": "data\\raw\\20260512\\img134604_ 33_198.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.10295526588573428,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 2.0971353107232518e-08,
+          "robust_center": 50352.0,
+          "robust_scale": 5040.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.10295526588573428,
+          "iterations": 24,
+          "converged": true,
+          "relative_change": 7.383880655817928e-08,
+          "robust_center": 50352.0,
+          "robust_scale": 5040.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.10295526588573428,
+          "iterations": 12,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 50352.0,
+          "robust_scale": 5040.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 6,
+        "Median+Gaussian": 5,
+        "Huber MRF lambda=0.1": 4,
+        "Huber MRF lambda=1": 6,
+        "Huber MRF lambda=10": 7
+      }
+    },
+    {
+      "angle_deg": 204,
+      "image_index": 34,
+      "image": "data\\raw\\20260512\\img134609_ 34_204.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.22070183651119574,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 6.456654529217136e-08,
+          "robust_center": 45056.0,
+          "robust_scale": 1840.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.22070183651119574,
+          "iterations": 22,
+          "converged": true,
+          "relative_change": 8.827124496999302e-08,
+          "robust_center": 45056.0,
+          "robust_scale": 1840.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.22070183651119574,
+          "iterations": 4,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 45056.0,
+          "robust_scale": 1840.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 4,
+        "Median+Gaussian": 4,
+        "Huber MRF lambda=0.1": 3,
+        "Huber MRF lambda=1": 4,
+        "Huber MRF lambda=10": 3
+      }
+    },
+    {
+      "angle_deg": 210,
+      "image_index": 35,
+      "image": "data\\raw\\20260512\\img134613_ 35_210.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.2968504233776317,
+          "iterations": 10,
+          "converged": true,
+          "relative_change": 2.223037118099575e-08,
+          "robust_center": 46208.0,
+          "robust_scale": 1520.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.2968504233776317,
+          "iterations": 24,
+          "converged": true,
+          "relative_change": 7.062428430144329e-08,
+          "robust_center": 46208.0,
+          "robust_scale": 1520.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.2968504233776317,
+          "iterations": 4,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 46208.0,
+          "robust_scale": 1520.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 4,
+        "Median+Gaussian": 5,
+        "Huber MRF lambda=0.1": 4,
+        "Huber MRF lambda=1": 6,
+        "Huber MRF lambda=10": 7
+      }
+    },
+    {
+      "angle_deg": 216,
+      "image_index": 36,
+      "image": "data\\raw\\20260512\\img134618_ 36_216.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.11701572705757267,
+          "iterations": 8,
+          "converged": true,
+          "relative_change": 8.903500586329038e-08,
+          "robust_center": 46112.0,
+          "robust_scale": 3856.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.11701572705757267,
+          "iterations": 12,
+          "converged": true,
+          "relative_change": 9.358746247723739e-08,
+          "robust_center": 46112.0,
+          "robust_scale": 3856.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.11701572705757267,
+          "iterations": 3,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 46112.0,
+          "robust_scale": 3856.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 5,
+        "Median+Gaussian": 4,
+        "Huber MRF lambda=0.1": 6,
+        "Huber MRF lambda=1": 4,
+        "Huber MRF lambda=10": 6
+      }
+    },
+    {
+      "angle_deg": 222,
+      "image_index": 37,
+      "image": "data\\raw\\20260512\\img134623_ 37_222.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.07421260584440784,
+          "iterations": 8,
+          "converged": true,
+          "relative_change": 7.721322072135762e-08,
+          "robust_center": 42032.0,
+          "robust_scale": 4560.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.07421260584440784,
+          "iterations": 18,
+          "converged": true,
+          "relative_change": 5.4533673297310195e-08,
+          "robust_center": 42032.0,
+          "robust_scale": 4560.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.07421260584440784,
+          "iterations": 3,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 42032.0,
+          "robust_scale": 4560.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 5,
+        "Median+Gaussian": 3,
+        "Huber MRF lambda=0.1": 6,
+        "Huber MRF lambda=1": 3,
+        "Huber MRF lambda=10": 4
+      }
+    },
+    {
+      "angle_deg": 228,
+      "image_index": 38,
+      "image": "data\\raw\\20260512\\img134627_ 38_228.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.21692915554519243,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 5.997173745552823e-08,
+          "robust_center": 44288.0,
+          "robust_scale": 1872.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.21692915554519243,
+          "iterations": 20,
+          "converged": true,
+          "relative_change": 6.126066785998905e-08,
+          "robust_center": 44288.0,
+          "robust_scale": 1872.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.21692915554519243,
+          "iterations": 3,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 44288.0,
+          "robust_scale": 1872.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 3,
+        "Median+Gaussian": 4,
+        "Huber MRF lambda=0.1": 3,
+        "Huber MRF lambda=1": 6,
+        "Huber MRF lambda=10": 4
+      }
+    },
+    {
+      "angle_deg": 234,
+      "image_index": 39,
+      "image": "data\\raw\\20260512\\img134632_ 39_234.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.14486707305244012,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 3.39061569954305e-08,
+          "robust_center": 42288.0,
+          "robust_scale": 2336.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.14486707305244012,
+          "iterations": 19,
+          "converged": true,
+          "relative_change": 6.3247894279236e-08,
+          "robust_center": 42288.0,
+          "robust_scale": 2336.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.14486707305244012,
+          "iterations": 3,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 42288.0,
+          "robust_scale": 2336.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 7,
+        "Median+Gaussian": 3,
+        "Huber MRF lambda=0.1": 8,
+        "Huber MRF lambda=1": 6,
+        "Huber MRF lambda=10": 3
+      }
+    },
+    {
+      "angle_deg": 240,
+      "image_index": 40,
+      "image": "data\\raw\\20260512\\img134637_ 40_240.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.1001667412216872,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 2.719572203122064e-08,
+          "robust_center": 39536.0,
+          "robust_scale": 2928.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.1001667412216872,
+          "iterations": 8,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 39536.0,
+          "robust_scale": 2928.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.1001667412216872,
+          "iterations": 3,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 39536.0,
+          "robust_scale": 2928.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 2,
+        "Median+Gaussian": 1,
+        "Huber MRF lambda=0.1": 4,
+        "Huber MRF lambda=1": 6,
+        "Huber MRF lambda=10": 3
+      }
+    },
+    {
+      "angle_deg": 246,
+      "image_index": 41,
+      "image": "data\\raw\\20260512\\img134642_ 41_246.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.19404213454730515,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 3.6507721735465426e-08,
+          "robust_center": 41120.0,
+          "robust_scale": 1744.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.19404213454730515,
+          "iterations": 18,
+          "converged": true,
+          "relative_change": 8.39055975511977e-08,
+          "robust_center": 41120.0,
+          "robust_scale": 1744.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.19404213454730515,
+          "iterations": 3,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 41120.0,
+          "robust_scale": 1744.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 5,
+        "Median+Gaussian": 5,
+        "Huber MRF lambda=0.1": 5,
+        "Huber MRF lambda=1": 4,
+        "Huber MRF lambda=10": 3
+      }
+    },
+    {
+      "angle_deg": 252,
+      "image_index": 42,
+      "image": "data\\raw\\20260512\\img134646_ 42_252.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.11162812795763022,
+          "iterations": 8,
+          "converged": true,
+          "relative_change": 9.40456238379246e-08,
+          "robust_center": 46976.0,
+          "robust_scale": 3840.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.11162812795763022,
+          "iterations": 21,
+          "converged": true,
+          "relative_change": 8.725047543108598e-08,
+          "robust_center": 46976.0,
+          "robust_scale": 3840.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.11162812795763022,
+          "iterations": 6,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 46976.0,
+          "robust_scale": 3840.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 7,
+        "Median+Gaussian": 6,
+        "Huber MRF lambda=0.1": 7,
+        "Huber MRF lambda=1": 5,
+        "Huber MRF lambda=10": 5
+      }
+    },
+    {
+      "angle_deg": 258,
+      "image_index": 43,
+      "image": "data\\raw\\20260512\\img134651_ 43_258.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.15852515212917911,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 5.0390202892906175e-08,
+          "robust_center": 47184.0,
+          "robust_scale": 2704.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.15852515212917911,
+          "iterations": 21,
+          "converged": true,
+          "relative_change": 9.091247260158165e-08,
+          "robust_center": 47184.0,
+          "robust_scale": 2704.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.15852515212917911,
+          "iterations": 7,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 47184.0,
+          "robust_scale": 2704.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 2,
+        "Median+Gaussian": 5,
+        "Huber MRF lambda=0.1": 5,
+        "Huber MRF lambda=1": 6,
+        "Huber MRF lambda=10": 5
+      }
+    },
+    {
+      "angle_deg": 264,
+      "image_index": 44,
+      "image": "data\\raw\\20260512\\img134656_ 44_264.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.19270539984264598,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 4.5257999384146816e-08,
+          "robust_center": 47952.0,
+          "robust_scale": 2400.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.19270539984264598,
+          "iterations": 17,
+          "converged": true,
+          "relative_change": 8.755031660004311e-08,
+          "robust_center": 47952.0,
+          "robust_scale": 2400.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.19270539984264598,
+          "iterations": 6,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 47952.0,
+          "robust_scale": 2400.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 5,
+        "Median+Gaussian": 7,
+        "Huber MRF lambda=0.1": 3,
+        "Huber MRF lambda=1": 3,
+        "Huber MRF lambda=10": 5
+      }
+    },
+    {
+      "angle_deg": 270,
+      "image_index": 45,
+      "image": "data\\raw\\20260512\\img134701_ 45_270.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.08709067568211401,
+          "iterations": 8,
+          "converged": true,
+          "relative_change": 7.132073258740143e-08,
+          "robust_center": 50528.0,
+          "robust_scale": 5440.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.08709067568211401,
+          "iterations": 24,
+          "converged": true,
+          "relative_change": 8.679976461720351e-08,
+          "robust_center": 50528.0,
+          "robust_scale": 5440.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.08709067568211401,
+          "iterations": 128,
+          "converged": true,
+          "relative_change": 9.673152410784441e-08,
+          "robust_center": 50528.0,
+          "robust_scale": 5440.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 6,
+        "Median+Gaussian": 7,
+        "Huber MRF lambda=0.1": 6,
+        "Huber MRF lambda=1": 8,
+        "Huber MRF lambda=10": 5
+      }
+    },
+    {
+      "angle_deg": 276,
+      "image_index": 46,
+      "image": "data\\raw\\20260512\\img134705_ 46_276.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.15946875422518614,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 4.151895230796048e-08,
+          "robust_center": 46432.0,
+          "robust_scale": 2688.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.15946875422518614,
+          "iterations": 27,
+          "converged": true,
+          "relative_change": 9.810808986530453e-08,
+          "robust_center": 46432.0,
+          "robust_scale": 2688.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.15946875422518614,
+          "iterations": 5,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 46432.0,
+          "robust_scale": 2688.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 7,
+        "Median+Gaussian": 6,
+        "Huber MRF lambda=0.1": 7,
+        "Huber MRF lambda=1": 8,
+        "Huber MRF lambda=10": 5
+      }
+    },
+    {
+      "angle_deg": 282,
+      "image_index": 47,
+      "image": "data\\raw\\20260512\\img134710_ 47_282.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.1339537535491563,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 3.038555480245371e-08,
+          "robust_center": 47008.0,
+          "robust_scale": 3200.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.1339537535491563,
+          "iterations": 22,
+          "converged": true,
+          "relative_change": 9.219273213780909e-08,
+          "robust_center": 47008.0,
+          "robust_scale": 3200.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.1339537535491563,
+          "iterations": 6,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 47008.0,
+          "robust_scale": 3200.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 2,
+        "Median+Gaussian": 4,
+        "Huber MRF lambda=0.1": 2,
+        "Huber MRF lambda=1": 3,
+        "Huber MRF lambda=10": 4
+      }
+    },
+    {
+      "angle_deg": 288,
+      "image_index": 48,
+      "image": "data\\raw\\20260512\\img134715_ 48_288.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.10973070124854091,
+          "iterations": 8,
+          "converged": true,
+          "relative_change": 8.148567091933085e-08,
+          "robust_center": 47648.0,
+          "robust_scale": 4112.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.10973070124854091,
+          "iterations": 18,
+          "converged": true,
+          "relative_change": 6.631860200118718e-08,
+          "robust_center": 47648.0,
+          "robust_scale": 4112.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.10973070124854091,
+          "iterations": 6,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 47648.0,
+          "robust_scale": 4112.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 4,
+        "Median+Gaussian": 6,
+        "Huber MRF lambda=0.1": 5,
+        "Huber MRF lambda=1": 7,
+        "Huber MRF lambda=10": 6
+      }
+    },
+    {
+      "angle_deg": 294,
+      "image_index": 49,
+      "image": "data\\raw\\20260512\\img134719_ 49_294.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.21150592665656257,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 6.476787838981436e-08,
+          "robust_center": 41856.0,
+          "robust_scale": 1600.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.21150592665656257,
+          "iterations": 20,
+          "converged": true,
+          "relative_change": 7.735483195860586e-08,
+          "robust_center": 41856.0,
+          "robust_scale": 1600.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.21150592665656257,
+          "iterations": 4,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 41856.0,
+          "robust_scale": 1600.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 5,
+        "Median+Gaussian": 2,
+        "Huber MRF lambda=0.1": 6,
+        "Huber MRF lambda=1": 5,
+        "Huber MRF lambda=10": 5
+      }
+    },
+    {
+      "angle_deg": 300,
+      "image_index": 50,
+      "image": "data\\raw\\20260512\\img134724_ 50_300.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.09582792793501219,
+          "iterations": 8,
+          "converged": true,
+          "relative_change": 6.940709914687315e-08,
+          "robust_center": 41488.0,
+          "robust_scale": 3296.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.09582792793501219,
+          "iterations": 19,
+          "converged": true,
+          "relative_change": 5.4126394085079216e-08,
+          "robust_center": 41488.0,
+          "robust_scale": 3296.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.09582792793501219,
+          "iterations": 3,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 41488.0,
+          "robust_scale": 3296.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 3,
+        "Median+Gaussian": 3,
+        "Huber MRF lambda=0.1": 3,
+        "Huber MRF lambda=1": 5,
+        "Huber MRF lambda=10": 2
+      }
+    },
+    {
+      "angle_deg": 306,
+      "image_index": 51,
+      "image": "data\\raw\\20260512\\img134729_ 51_306.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.13483984395227122,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 3.1321522155776923e-08,
+          "robust_center": 45136.0,
+          "robust_scale": 2928.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.13483984395227122,
+          "iterations": 25,
+          "converged": true,
+          "relative_change": 8.219480089693612e-08,
+          "robust_center": 45136.0,
+          "robust_scale": 2928.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.13483984395227122,
+          "iterations": 4,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 45136.0,
+          "robust_scale": 2928.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 4,
+        "Median+Gaussian": 4,
+        "Huber MRF lambda=0.1": 8,
+        "Huber MRF lambda=1": 5,
+        "Huber MRF lambda=10": 3
+      }
+    },
+    {
+      "angle_deg": 312,
+      "image_index": 52,
+      "image": "data\\raw\\20260512\\img134734_ 52_312.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.1714912918836995,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 3.756927474150942e-08,
+          "robust_center": 46128.0,
+          "robust_scale": 2368.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.1714912918836995,
+          "iterations": 18,
+          "converged": true,
+          "relative_change": 8.724752271049968e-08,
+          "robust_center": 46128.0,
+          "robust_scale": 2368.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.1714912918836995,
+          "iterations": 4,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 46128.0,
+          "robust_scale": 2368.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 5,
+        "Median+Gaussian": 7,
+        "Huber MRF lambda=0.1": 4,
+        "Huber MRF lambda=1": 6,
+        "Huber MRF lambda=10": 5
+      }
+    },
+    {
+      "angle_deg": 318,
+      "image_index": 53,
+      "image": "data\\raw\\20260512\\img134738_ 53_318.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.07833552839131949,
+          "iterations": 8,
+          "converged": true,
+          "relative_change": 7.97443160479732e-08,
+          "robust_center": 43504.0,
+          "robust_scale": 4896.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.07833552839131949,
+          "iterations": 21,
+          "converged": true,
+          "relative_change": 8.646733840632779e-08,
+          "robust_center": 43504.0,
+          "robust_scale": 4896.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.07833552839131949,
+          "iterations": 3,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 43504.0,
+          "robust_scale": 4896.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 5,
+        "Median+Gaussian": 3,
+        "Huber MRF lambda=0.1": 5,
+        "Huber MRF lambda=1": 2,
+        "Huber MRF lambda=10": 4
+      }
+    },
+    {
+      "angle_deg": 324,
+      "image_index": 54,
+      "image": "data\\raw\\20260512\\img134743_ 54_324.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.1233114401293014,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 2.0845065363207635e-08,
+          "robust_center": 50304.0,
+          "robust_scale": 4208.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.1233114401293014,
+          "iterations": 26,
+          "converged": true,
+          "relative_change": 9.172150223633069e-08,
+          "robust_center": 50304.0,
+          "robust_scale": 4208.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.1233114401293014,
+          "iterations": 5,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 50304.0,
+          "robust_scale": 4208.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 4,
+        "Median+Gaussian": 4,
+        "Huber MRF lambda=0.1": 7,
+        "Huber MRF lambda=1": 6,
+        "Huber MRF lambda=10": 5
+      }
+    },
+    {
+      "angle_deg": 330,
+      "image_index": 55,
+      "image": "data\\raw\\20260512\\img134748_ 55_330.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.29565344586401227,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 5.9467970934596484e-08,
+          "robust_center": 47856.0,
+          "robust_scale": 1488.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.29565344586401227,
+          "iterations": 20,
+          "converged": true,
+          "relative_change": 6.054736833831439e-08,
+          "robust_center": 47856.0,
+          "robust_scale": 1488.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.29565344586401227,
+          "iterations": 4,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 47856.0,
+          "robust_scale": 1488.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 3,
+        "Median+Gaussian": 5,
+        "Huber MRF lambda=0.1": 4,
+        "Huber MRF lambda=1": 4,
+        "Huber MRF lambda=10": 4
+      }
+    },
+    {
+      "angle_deg": 336,
+      "image_index": 56,
+      "image": "data\\raw\\20260512\\img134753_ 56_336.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.14921053026917988,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 4.1500645710232466e-08,
+          "robust_center": 47232.0,
+          "robust_scale": 3024.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.14921053026917988,
+          "iterations": 18,
+          "converged": true,
+          "relative_change": 6.457451908552094e-08,
+          "robust_center": 47232.0,
+          "robust_scale": 3024.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.14921053026917988,
+          "iterations": 4,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 47232.0,
+          "robust_scale": 3024.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 4,
+        "Median+Gaussian": 4,
+        "Huber MRF lambda=0.1": 7,
+        "Huber MRF lambda=1": 7,
+        "Huber MRF lambda=10": 8
+      }
+    },
+    {
+      "angle_deg": 342,
+      "image_index": 57,
+      "image": "data\\raw\\20260512\\img134757_ 57_342.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.10254832807590912,
+          "iterations": 8,
+          "converged": true,
+          "relative_change": 8.32170649405727e-08,
+          "robust_center": 52464.0,
+          "robust_scale": 5280.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.10254832807590912,
+          "iterations": 19,
+          "converged": true,
+          "relative_change": 5.986685367327183e-08,
+          "robust_center": 52464.0,
+          "robust_scale": 5280.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.10254832807590912,
+          "iterations": 7,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 52464.0,
+          "robust_scale": 5280.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 8,
+        "Median+Gaussian": 10,
+        "Huber MRF lambda=0.1": 8,
+        "Huber MRF lambda=1": 7,
+        "Huber MRF lambda=10": 8
+      }
+    },
+    {
+      "angle_deg": 348,
+      "image_index": 58,
+      "image": "data\\raw\\20260512\\img134802_ 58_348.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.12546961750813038,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 2.714043138420167e-08,
+          "robust_center": 47408.0,
+          "robust_scale": 3776.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.12546961750813038,
+          "iterations": 16,
+          "converged": true,
+          "relative_change": 6.229632888353407e-08,
+          "robust_center": 47408.0,
+          "robust_scale": 3776.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.12546961750813038,
+          "iterations": 4,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 47408.0,
+          "robust_scale": 3776.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 4,
+        "Median+Gaussian": 6,
+        "Huber MRF lambda=0.1": 6,
+        "Huber MRF lambda=1": 4,
+        "Huber MRF lambda=10": 5
+      }
+    },
+    {
+      "angle_deg": 354,
+      "image_index": 59,
+      "image": "data\\raw\\20260512\\img134807_ 59_354.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.10631250281679076,
+          "iterations": 9,
+          "converged": true,
+          "relative_change": 2.1708958795512955e-08,
+          "robust_center": 46400.0,
+          "robust_scale": 4032.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.10631250281679076,
+          "iterations": 23,
+          "converged": true,
+          "relative_change": 9.00775970166077e-08,
+          "robust_center": 46400.0,
+          "robust_scale": 4032.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.10631250281679076,
+          "iterations": 4,
+          "converged": true,
+          "relative_change": 0.0,
+          "robust_center": 46400.0,
+          "robust_scale": 4032.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 5,
+        "Median+Gaussian": 6,
+        "Huber MRF lambda=0.1": 7,
+        "Huber MRF lambda=1": 5,
+        "Huber MRF lambda=10": 4
+      }
+    },
+    {
+      "angle_deg": 360,
+      "image_index": 60,
+      "image": "data\\raw\\20260512\\img134811_ 60_360.tiff",
+      "mrf": {
+        "Huber MRF lambda=0.1": {
+          "lambda": 0.1,
+          "huber_delta_normalized": 0.0940026340695834,
+          "iterations": 8,
+          "converged": true,
+          "relative_change": 9.733917470477012e-08,
+          "robust_center": 50176.0,
+          "robust_scale": 5280.0
+        },
+        "Huber MRF lambda=1": {
+          "lambda": 1.0,
+          "huber_delta_normalized": 0.0940026340695834,
+          "iterations": 21,
+          "converged": true,
+          "relative_change": 7.186629747611563e-08,
+          "robust_center": 50176.0,
+          "robust_scale": 5280.0
+        },
+        "Huber MRF lambda=10": {
+          "lambda": 10.0,
+          "huber_delta_normalized": 0.0940026340695834,
+          "iterations": 143,
+          "converged": true,
+          "relative_change": 9.50590102900718e-08,
+          "robust_center": 50176.0,
+          "robust_scale": 5280.0
+        }
+      },
+      "candidate_counts": {
+        "Raw": 7,
+        "Median+Gaussian": 9,
+        "Huber MRF lambda=0.1": 8,
+        "Huber MRF lambda=1": 4,
+        "Huber MRF lambda=10": 7
+      }
+    }
+  ]
+}
