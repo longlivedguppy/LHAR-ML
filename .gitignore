@@ -1,3 +1,18 @@
 *.pyc
 **/__pycache__/
-**/output_plots/
+
+# Generated analysis outputs
+mrf_comparison/
+mrf_comparison_batch/
+output_plots/
+data/processed/
+data/enhanced/
+
+# Common generated image outputs
+*.png
+*.jpg
+*.jpeg
+*.tif
+*.tiff
+*.svg
+*.pdf

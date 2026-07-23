@@ -1,4 +1,4 @@
-"""Compare one raw LHAR image line with Median+Gaussian and Huber MRF.
+"""Compare an averaged parallel-line LHAR profile with denoising methods.
 
 This is a deliberately isolated preliminary experiment. It does not import or
 write to the production pipeline's processed/output directories and does not
@@ -33,6 +33,13 @@ DEFAULT_DATASET = "260115-1-20um50cyc"
 DEFAULT_REGULARIZATIONS = (0.1, 1.0, 10.0)
 DEFAULT_PLOT_METHOD = "mrf"
 DEFAULT_PLOT_REGULARIZATION = 1.0
+DEFAULT_MEDIAN_KERNEL = 5
+DEFAULT_GAUSSIAN_SIGMA = 5.0
+DEFAULT_DERIVATIVE_HEIGHT_FRACTION = 0.35
+DEFAULT_INTENSITY_HEIGHT_FRACTION = 0.45
+DEFAULT_PROFILE_LINE_COUNT = 1
+DEFAULT_PROFILE_LINE_SPACING = 1.0
+SUPPORTED_PROFILE_LINE_COUNTS = (1, 5, 10, 20, 100)
 PLOT_METHODS = ("median", "gaussian", "median_gaussian", "mrf")
 
 
@@ -51,9 +58,23 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument("--x", type=int, default=878, help="single vertical line x-coordinate")
     parser.add_argument("--y-start", type=int, default=1400, help="first vertical coordinate (inclusive)")
     parser.add_argument("--y-end", type=int, default=200, help="last vertical coordinate (inclusive)")
+    parser.add_argument(
+        "--line-count",
+        "--profile-line-count",
+        dest="profile_line_count",
+        type=int,
+        default=DEFAULT_PROFILE_LINE_COUNT,
+        help="positive number of parallel Raw profiles averaged before denoising",
+    )
+    parser.add_argument(
+        "--line-spacing",
+        type=float,
+        default=DEFAULT_PROFILE_LINE_SPACING,
+        help="spacing between parallel profiles in pixels",
+    )
     parser.add_argument("--start-distance", type=int, default=50, help="exclude this many initial profile samples from peak assessment")
-    parser.add_argument("--median-kernel", type=int, default=5)
-    parser.add_argument("--gaussian-sigma", type=float, default=5.0)
+    parser.add_argument("--median-kernel", type=int, default=DEFAULT_MEDIAN_KERNEL)
+    parser.add_argument("--gaussian-sigma", type=float, default=DEFAULT_GAUSSIAN_SIGMA)
     parser.add_argument("--regularization", nargs="+", type=float, default=DEFAULT_REGULARIZATIONS, metavar="LAMBDA")
     parser.add_argument(
         "--plot-method",
@@ -73,15 +94,39 @@ def parse_arguments() -> argparse.Namespace:
         action="store_true",
         help="also save the legacy five-panel multi-method comparison",
     )
+    parser.add_argument(
+        "--derivative-height-fraction",
+        type=float,
+        default=DEFAULT_DERIVATIVE_HEIGHT_FRACTION,
+        help="target plot-height fraction occupied by the assessed absolute derivative",
+    )
+    parser.add_argument(
+        "--intensity-height-fraction",
+        type=float,
+        default=DEFAULT_INTENSITY_HEIGHT_FRACTION,
+        help="target plot-height fraction occupied by Raw/Denoise intensity",
+    )
     parser.add_argument("--output-root", type=Path, default=Path("mrf_comparison"))
     parser.add_argument("--peak-noise-factor", type=float, default=5.0, help="minimum prominence as a multiple of derivative MAD noise")
+    parser.add_argument(
+        "--peak-prominence",
+        type=float,
+        help="fixed minimum peak prominence; omitted keeps the existing adaptive MAD threshold",
+    )
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_arguments()
     image_path = args.image or select_zero_degree_image(Path("data") / "raw" / args.dataset)
-    raw_profile = load_vertical_line(image_path, args.x, args.y_start, args.y_end)
+    raw_profile = load_averaged_vertical_profile(
+        image_path,
+        args.x,
+        args.y_start,
+        args.y_end,
+        args.profile_line_count,
+        args.line_spacing,
+    )
     median = median_filter(raw_profile, args.median_kernel)
     gaussian = gaussian_filter(raw_profile, args.gaussian_sigma)
     median_gaussian = gaussian_filter(median, args.gaussian_sigma)
@@ -98,17 +143,72 @@ def main() -> None:
         mrf_results[label] = result
 
     derivatives = {name: np.gradient(values) for name, values in profiles.items()}
+    prominence_thresholds = {
+        name: calculate_peak_prominence_threshold(
+            np.abs(derivative),
+            args.start_distance,
+            args.peak_noise_factor,
+            args.peak_prominence,
+        )
+        for name, derivative in derivatives.items()
+    }
     peaks = {
-        name: find_significant_peaks(np.abs(derivative), args.start_distance, args.peak_noise_factor)
+        name: find_significant_peaks(
+            np.abs(derivative),
+            args.start_distance,
+            args.peak_noise_factor,
+            args.peak_prominence,
+        )
         for name, derivative in derivatives.items()
     }
     metrics = calculate_metrics(profiles, derivatives, peaks, args.start_distance)
+    metrics = [
+        {
+            "profile_line_count": args.profile_line_count,
+            "profile_line_spacing_pixels": args.line_spacing,
+            "sampling_width_pixels": (args.profile_line_count - 1) * args.line_spacing,
+            "line_aggregation": "mean",
+            "peak_threshold_mode": "fixed" if args.peak_prominence is not None else "adaptive_mad",
+            "peak_prominence_threshold": prominence_thresholds[row["method"]],
+            **row,
+        }
+        for row in metrics
+    ]
 
-    output_dir = build_output_directory(args.output_root, args.dataset, image_path, args.x)
+    denoise_tag = build_denoise_tag(
+        args.plot_method,
+        args.median_kernel,
+        args.gaussian_sigma,
+        args.plot_regularization,
+    )
+    output_dir = build_output_directory(
+        args.output_root,
+        args.dataset,
+        image_path,
+        args.x,
+        denoise_tag,
+        args.profile_line_count,
+        args.line_spacing,
+        args.peak_prominence,
+    )
     output_dir.mkdir(parents=True, exist_ok=True)
-    save_profiles(output_dir / "profiles.csv", profiles, derivatives)
+    save_profiles(
+        output_dir / "profiles.csv",
+        profiles,
+        derivatives,
+        args.profile_line_count,
+        args.line_spacing,
+    )
     save_metrics(output_dir / "metrics.csv", metrics)
-    save_peaks(output_dir / "significant_peaks.csv", peaks, derivatives["Raw"], args.start_distance)
+    save_peaks(
+        output_dir / "significant_peaks.csv",
+        peaks,
+        derivatives["Raw"],
+        args.start_distance,
+        args.profile_line_count,
+        args.line_spacing,
+        prominence_thresholds,
+    )
     denoised_profile, denoise_label, title_method, analysis_name = select_plot_profile(
         args.plot_method,
         args.plot_regularization,
@@ -121,7 +221,10 @@ def main() -> None:
     selected_peaks = peaks.get(analysis_name)
     if selected_peaks is None:
         selected_peaks = find_significant_peaks(
-            np.abs(denoised_derivative), args.start_distance, args.peak_noise_factor
+            np.abs(denoised_derivative),
+            args.start_distance,
+            args.peak_noise_factor,
+            args.peak_prominence,
         )
     simple_plot_single_method(
         output_dir / "comparison_overview.png",
@@ -133,6 +236,10 @@ def main() -> None:
         denoise_label,
         title_method,
         image_path.stem,
+        derivative_height_fraction=args.derivative_height_fraction,
+        intensity_height_fraction=args.intensity_height_fraction,
+        profile_line_count=args.profile_line_count,
+        profile_line_spacing=args.line_spacing,
     )
     if args.comparison_plot:
         comparison_plot_multi_method(
@@ -141,6 +248,7 @@ def main() -> None:
             derivatives,
             peaks,
             args.start_distance,
+            args.profile_line_count,
         )
     save_metadata(output_dir / "run_metadata.json", args, image_path, raw_profile, mrf_results, peaks)
     save_summary(output_dir / "summary.txt", metrics, peaks, mrf_results)
@@ -155,19 +263,88 @@ def select_zero_degree_image(dataset_dir: Path) -> Path:
     return zero_degree[0] if zero_degree else candidates[0]
 
 
-def load_vertical_line(image_path: Path, x: int, y_start: int, y_end: int) -> np.ndarray:
+def parallel_line_offsets(
+    line_count: int,
+    line_spacing: float = DEFAULT_PROFILE_LINE_SPACING,
+) -> np.ndarray:
+    """Return offsets symmetric about the nominal line, including half pixels."""
+    if line_count < 1:
+        raise ValueError("profile line count must be positive")
+    if not np.isfinite(line_spacing) or line_spacing <= 0:
+        raise ValueError("profile line spacing must be a positive finite number")
+    centered_indices = np.arange(line_count, dtype=float) - (line_count - 1) / 2
+    return centered_indices * line_spacing
+
+
+def extract_parallel_profiles(
+    image_path: Path,
+    x: float,
+    y_start: int,
+    y_end: int,
+    line_count: int,
+    line_spacing: float = DEFAULT_PROFILE_LINE_SPACING,
+) -> np.ndarray:
+    """Sample parallel vertical profiles using linear interpolation in x."""
     with Image.open(image_path) as image:
         array = np.asarray(image)
     if array.ndim == 3:
         array = array.astype(float).mean(axis=2)
     if array.ndim != 2:
         raise ValueError(f"expected a 2D image, got shape {array.shape}")
-    if not 0 <= x < array.shape[1]:
-        raise ValueError(f"x={x} is outside image width {array.shape[1]}")
     if not (0 <= y_start < array.shape[0] and 0 <= y_end < array.shape[0]):
         raise ValueError(f"y range {y_start}..{y_end} is outside image height {array.shape[0]}")
+
+    offsets = parallel_line_offsets(line_count, line_spacing)
+    x_coordinates = float(x) + offsets
+    if np.any(x_coordinates < 0) or np.any(x_coordinates > array.shape[1] - 1):
+        raise ValueError(
+            f"cannot sample {line_count} lines centered at x={x:g}; "
+            f"required x range is {x_coordinates[0]:g}..{x_coordinates[-1]:g}, "
+            f"but image range is 0..{array.shape[1] - 1}"
+        )
+
     step = 1 if y_start <= y_end else -1
-    return array[np.arange(y_start, y_end + step, step), x].astype(float)
+    y_coordinates = np.arange(y_start, y_end + step, step)
+    left = np.floor(x_coordinates).astype(int)
+    right = np.ceil(x_coordinates).astype(int)
+    right_weight = x_coordinates - left
+    left_weight = 1.0 - right_weight
+
+    left_values = array[y_coordinates[:, None], left[None, :]].astype(float)
+    right_values = array[y_coordinates[:, None], right[None, :]].astype(float)
+    sampled = left_values * left_weight[None, :] + right_values * right_weight[None, :]
+    return sampled.T
+
+
+def average_line_profiles(profiles: np.ndarray) -> np.ndarray:
+    """Average equally sized Raw profiles before any denoising operation."""
+    if profiles.ndim != 2 or profiles.shape[0] == 0 or profiles.shape[1] == 0:
+        raise ValueError("parallel profiles must be a non-empty 2D array")
+    return np.mean(profiles, axis=0)
+
+
+def load_averaged_vertical_profile(
+    image_path: Path,
+    x: float,
+    y_start: int,
+    y_end: int,
+    line_count: int = DEFAULT_PROFILE_LINE_COUNT,
+    line_spacing: float = DEFAULT_PROFILE_LINE_SPACING,
+) -> np.ndarray:
+    profiles = extract_parallel_profiles(
+        image_path,
+        x,
+        y_start,
+        y_end,
+        line_count,
+        line_spacing,
+    )
+    return average_line_profiles(profiles)
+
+
+def load_vertical_line(image_path: Path, x: int, y_start: int, y_end: int) -> np.ndarray:
+    """Backward-compatible one-line loader."""
+    return load_averaged_vertical_profile(image_path, x, y_start, y_end, line_count=1)
 
 
 def median_filter(profile: np.ndarray, kernel_size: int) -> np.ndarray:
@@ -182,12 +359,35 @@ def gaussian_filter(profile: np.ndarray, sigma: float, truncate: float = 4.0) ->
     return gaussian_filter1d(profile, sigma=sigma, truncate=truncate)
 
 
-def find_significant_peaks(values: np.ndarray, start: int, noise_factor: float) -> list[Peak]:
+def calculate_peak_prominence_threshold(
+    values: np.ndarray,
+    start: int,
+    noise_factor: float,
+    fixed_prominence: float | None = None,
+) -> float:
+    if fixed_prominence is not None:
+        if not np.isfinite(fixed_prominence) or fixed_prominence <= 0:
+            raise ValueError("fixed peak prominence must be a positive finite number")
+        return float(fixed_prominence)
+    noise = derivative_noise_scale(values[start:])
+    return max(noise_factor * noise, np.finfo(float).eps)
+
+
+def find_significant_peaks(
+    values: np.ndarray,
+    start: int,
+    noise_factor: float,
+    fixed_prominence: float | None = None,
+) -> list[Peak]:
     """Return thresholded local maxima; never fall back to argmax."""
     if values.size < 3 or start >= values.size - 1:
         return []
-    noise = derivative_noise_scale(values[start:])
-    minimum_prominence = max(noise_factor * noise, np.finfo(float).eps)
+    minimum_prominence = calculate_peak_prominence_threshold(
+        values,
+        start,
+        noise_factor,
+        fixed_prominence,
+    )
     search_values = values[start:]
     local, properties = find_peaks(search_values, prominence=minimum_prominence)
     if local.size == 0:
@@ -252,13 +452,19 @@ def calculate_metrics(
     return rows
 
 
-def save_profiles(path: Path, profiles: dict[str, np.ndarray], derivatives: dict[str, np.ndarray]) -> None:
+def save_profiles(
+    path: Path,
+    profiles: dict[str, np.ndarray],
+    derivatives: dict[str, np.ndarray],
+    profile_line_count: int = DEFAULT_PROFILE_LINE_COUNT,
+    profile_line_spacing: float = DEFAULT_PROFILE_LINE_SPACING,
+) -> None:
     names = list(profiles)
     with path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.writer(handle)
-        writer.writerow(["distance", *names, *(f"derivative:{name}" for name in names), *(f"abs_derivative:{name}" for name in names)])
+        writer.writerow(["profile_line_count", "profile_line_spacing_pixels", "sampling_width_pixels", "line_aggregation", "distance", *names, *(f"derivative:{name}" for name in names), *(f"abs_derivative:{name}" for name in names)])
         for index in range(len(next(iter(profiles.values())))):
-            writer.writerow([index, *(profiles[name][index] for name in names), *(derivatives[name][index] for name in names), *(abs(derivatives[name][index]) for name in names)])
+            writer.writerow([profile_line_count, profile_line_spacing, (profile_line_count - 1) * profile_line_spacing, "mean", index, *(profiles[name][index] for name in names), *(derivatives[name][index] for name in names), *(abs(derivatives[name][index]) for name in names)])
 
 
 def save_metrics(path: Path, rows: list[dict[str, object]]) -> None:
@@ -268,15 +474,24 @@ def save_metrics(path: Path, rows: list[dict[str, object]]) -> None:
         writer.writerows(rows)
 
 
-def save_peaks(path: Path, peaks: dict[str, list[Peak]], raw_derivative: np.ndarray, start: int) -> None:
+def save_peaks(
+    path: Path,
+    peaks: dict[str, list[Peak]],
+    raw_derivative: np.ndarray,
+    start: int,
+    profile_line_count: int = DEFAULT_PROFILE_LINE_COUNT,
+    profile_line_spacing: float = DEFAULT_PROFILE_LINE_SPACING,
+    prominence_thresholds: dict[str, float] | None = None,
+) -> None:
     raw_absolute = np.abs(raw_derivative)
     with path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.writer(handle)
-        writer.writerow(["method", "rank_by_prominence", "position", "height", "prominence", "width", "raw_local_peak_support", "raw_support_distance", "artificial_peak_suspect", "interpretation"])
+        writer.writerow(["profile_line_count", "profile_line_spacing_pixels", "sampling_width_pixels", "line_aggregation", "peak_prominence_threshold", "method", "rank_by_prominence", "position", "height", "prominence", "width", "raw_local_peak_support", "raw_support_distance", "artificial_peak_suspect", "interpretation"])
         for method, method_peaks in peaks.items():
             for rank, peak in enumerate(method_peaks, 1):
                 supported, distance = raw_support(raw_absolute, peak.position, start)
-                writer.writerow([method, rank, peak.position, peak.height, peak.prominence, peak.width, supported, distance, not supported, "candidate_only_not_PD"])
+                threshold = "" if prominence_thresholds is None else prominence_thresholds[method]
+                writer.writerow([profile_line_count, profile_line_spacing, (profile_line_count - 1) * profile_line_spacing, "mean", threshold, method, rank, peak.position, peak.height, peak.prominence, peak.width, supported, distance, not supported, "candidate_only_not_PD"])
 
 
 def raw_support(raw_absolute_derivative: np.ndarray, position: int, start: int, tolerance: int = 3) -> tuple[bool, object]:
@@ -295,6 +510,123 @@ def raw_support(raw_absolute_derivative: np.ndarray, position: int, start: int, 
         return False, ""
     distance = min(abs(position - index) for index in local_positions)
     return True, distance
+
+
+def format_tag_number(value: float) -> str:
+    """Format a numeric parameter as a filesystem-friendly tag component."""
+    if not np.isfinite(value):
+        raise ValueError("denoise parameters used in output tags must be finite")
+    text = f"{float(value):.12g}".lower()
+    return text.replace("-", "m").replace("+", "").replace(".", "p")
+
+
+def build_denoise_tag(
+    method: str,
+    median_kernel: int = DEFAULT_MEDIAN_KERNEL,
+    gaussian_sigma: float = DEFAULT_GAUSSIAN_SIGMA,
+    regularization: float = DEFAULT_PLOT_REGULARIZATION,
+) -> str:
+    """Build a stable directory tag from the selected denoiser and key parameters."""
+    if method == "median":
+        return "median" if median_kernel == DEFAULT_MEDIAN_KERNEL else f"median_k{median_kernel}"
+    if method == "gaussian":
+        if np.isclose(gaussian_sigma, DEFAULT_GAUSSIAN_SIGMA):
+            return "gaussian"
+        return f"gaussian_sigma_{format_tag_number(gaussian_sigma)}"
+    if method == "median_gaussian":
+        tag = "median_gaussian"
+        if median_kernel != DEFAULT_MEDIAN_KERNEL:
+            tag += f"_k{median_kernel}"
+        if not np.isclose(gaussian_sigma, DEFAULT_GAUSSIAN_SIGMA):
+            tag += f"_sigma_{format_tag_number(gaussian_sigma)}"
+        return tag
+    if method == "mrf":
+        return f"mrf_lambda_{format_tag_number(regularization)}"
+    raise ValueError(f"unsupported plot method: {method}")
+
+
+def build_line_count_tag(
+    line_count: int,
+    line_spacing: float = DEFAULT_PROFILE_LINE_SPACING,
+) -> str:
+    if line_count < 1:
+        raise ValueError("profile line count must be positive")
+    if not np.isfinite(line_spacing) or line_spacing <= 0:
+        raise ValueError("profile line spacing must be a positive finite number")
+    tag = f"line_{line_count}"
+    if not np.isclose(line_spacing, DEFAULT_PROFILE_LINE_SPACING):
+        tag += f"_spacing_{format_tag_number(line_spacing)}"
+    return tag
+
+
+def build_peak_threshold_tag(fixed_prominence: float) -> str:
+    if not np.isfinite(fixed_prominence) or fixed_prominence <= 0:
+        raise ValueError("fixed peak prominence must be a positive finite number")
+    return f"peak_prominence_{format_tag_number(fixed_prominence)}"
+
+
+def calculate_derivative_ylim(
+    absolute_derivative: np.ndarray,
+    peaks: list[Peak],
+    start: int,
+    target_fraction: float = DEFAULT_DERIVATIVE_HEIGHT_FRACTION,
+    robust_percentile: float = 99.0,
+) -> tuple[float, float]:
+    """Scale assessed derivatives into the lower part of the shared plot area."""
+    if not 0 < target_fraction <= 1:
+        raise ValueError("derivative height fraction must be in (0, 1]")
+    if absolute_derivative.size == 0:
+        raise ValueError("absolute derivative must not be empty")
+
+    assessment_start = min(max(start, 0), absolute_derivative.size)
+    assessed = absolute_derivative[assessment_start:]
+    finite_assessed = assessed[np.isfinite(assessed)]
+    if finite_assessed.size == 0:
+        finite_assessed = absolute_derivative[np.isfinite(absolute_derivative)]
+
+    robust_maximum = (
+        float(np.percentile(finite_assessed, robust_percentile))
+        if finite_assessed.size
+        else 0.0
+    )
+    selected_peak_value = 0.0
+    if peaks and 0 <= peaks[0].position < absolute_derivative.size:
+        selected_peak_value = float(absolute_derivative[peaks[0].position])
+
+    scale_reference = max(robust_maximum, selected_peak_value)
+    if not np.isfinite(scale_reference) or scale_reference <= np.finfo(float).eps:
+        scale_reference = 1.0
+    return 0.0, scale_reference / target_fraction
+
+
+def calculate_intensity_ylim(
+    raw_profile: np.ndarray,
+    denoised_profile: np.ndarray,
+    target_fraction: float = DEFAULT_INTENSITY_HEIGHT_FRACTION,
+    upper_margin_fraction: float = 0.08,
+) -> tuple[float, float]:
+    """Place the combined Raw/Denoise value range in the upper plot region."""
+    if not 0 < target_fraction <= 1:
+        raise ValueError("intensity height fraction must be in (0, 1]")
+    finite_values = np.concatenate((raw_profile, denoised_profile))
+    finite_values = finite_values[np.isfinite(finite_values)]
+    if finite_values.size == 0:
+        raise ValueError("intensity profiles must contain at least one finite value")
+
+    data_min = float(np.min(finite_values))
+    data_max = float(np.max(finite_values))
+    data_range = data_max - data_min
+    if data_range <= np.finfo(float).eps:
+        fallback_range = max(abs(data_min) * 0.02, 1.0)
+        data_min -= fallback_range / 2
+        data_max += fallback_range / 2
+        data_range = fallback_range
+
+    axis_range = data_range / target_fraction
+    upper_margin = data_range * upper_margin_fraction
+    upper_limit = data_max + upper_margin
+    lower_limit = upper_limit - axis_range
+    return lower_limit, upper_limit
 
 
 def select_plot_profile(
@@ -332,6 +664,10 @@ def simple_plot_single_method(
     denoise_label: str,
     title_method: str,
     sample_name: str,
+    derivative_height_fraction: float = DEFAULT_DERIVATIVE_HEIGHT_FRACTION,
+    intensity_height_fraction: float = DEFAULT_INTENSITY_HEIGHT_FRACTION,
+    profile_line_count: int = DEFAULT_PROFILE_LINE_COUNT,
+    profile_line_spacing: float = DEFAULT_PROFILE_LINE_SPACING,
 ) -> None:
     """Save the default, readable Raw/Denoise/absolute-derivative view."""
     if not (raw_profile.size == denoised_profile.size == derivative.size):
@@ -405,24 +741,30 @@ def simple_plot_single_method(
     intensity_axis.tick_params(axis="y", labelsize=13, labelcolor="tab:blue")
     derivative_axis.tick_params(axis="y", labelcolor="tab:orange")
     derivative_axis.grid(True, alpha=0.28)
-    if raw_profile.size:
-        derivative_axis.set_xlim(0, raw_profile.size - 1)
-
-    if start > 0 and raw_profile.size:
-        annotation_x = min(start, raw_profile.size - 1) / 2
-        derivative_axis.annotate(
-            "Excluded from\npeak assessment",
-            xy=(annotation_x, 0.97),
-            xycoords=("data", "axes fraction"),
-            ha="center",
-            va="top",
-            fontsize=12,
-            color="0.25",
-            fontweight="semibold",
+    derivative_axis.set_xlim(0, raw_profile.size - 1)
+    derivative_axis.set_ylim(
+        calculate_derivative_ylim(
+            absolute_derivative,
+            peaks,
+            start,
+            derivative_height_fraction,
         )
+    )
+    intensity_axis.set_ylim(
+        calculate_intensity_ylim(
+            raw_profile,
+            denoised_profile,
+            intensity_height_fraction,
+        )
+    )
 
+    line_description = (
+        "1-line" if profile_line_count == 1 else f"{profile_line_count}-line mean"
+    )
+    if not np.isclose(profile_line_spacing, DEFAULT_PROFILE_LINE_SPACING):
+        line_description += f", spacing={profile_line_spacing:g} px"
     derivative_axis.set_title(
-        f"1D Derivative & Intensity: {title_method} - {sample_name}",
+        f"1D Derivative & Intensity: {title_method} ({line_description}) - {sample_name}",
         fontsize=20,
         pad=18,
     )
@@ -446,6 +788,7 @@ def comparison_plot_multi_method(
     derivatives: dict[str, np.ndarray],
     peaks: dict[str, list[Peak]],
     start: int,
+    profile_line_count: int = DEFAULT_PROFILE_LINE_COUNT,
 ) -> None:
     distance = np.arange(len(next(iter(profiles.values()))))
     colors = plt.cm.tab10(np.linspace(0, 1, len(profiles)))
@@ -496,7 +839,11 @@ def comparison_plot_multi_method(
     axes[2].set_ylabel("|Gray value / pixel|", fontsize=14)
     axes[3].set_ylabel("|Gray value / pixel|", fontsize=14)
     axes[4].set_ylabel("Gray-value residual", fontsize=14)
-    figure.suptitle("Preliminary single-line comparison: Raw vs Median+Gaussian vs Huber MRF", fontsize=19)
+    line_description = "1-line" if profile_line_count == 1 else f"{profile_line_count}-line mean"
+    figure.suptitle(
+        f"Preliminary {line_description} comparison: Raw vs Median+Gaussian vs Huber MRF",
+        fontsize=19,
+    )
     figure.savefig(path, dpi=180)
     plt.close(figure)
 
@@ -514,11 +861,25 @@ def save_metadata(
     peaks: dict[str, list[Peak]],
 ) -> None:
     payload = {
-        "scope": "preliminary single-image single-line comparison; no PD classification",
+        "scope": "preliminary single-image parallel-line mean comparison; no PD classification",
         "image": str(image_path),
         "image_line": {"x": args.x, "y_start": args.y_start, "y_end": args.y_end, "samples": int(raw_profile.size)},
+        "profile_sampling": {
+            "line_count": args.profile_line_count,
+            "line_aggregation": "mean",
+            "line_spacing_pixels": args.line_spacing,
+            "sampling_width_pixels": (args.profile_line_count - 1) * args.line_spacing,
+            "x_offsets_pixels": parallel_line_offsets(args.profile_line_count, args.line_spacing).tolist(),
+            "even_line_interpolation": "linear_x",
+        },
         "median_gaussian": {"median_kernel": args.median_kernel, "gaussian_sigma": args.gaussian_sigma},
-        "peak_assessment": {"start_distance": args.start_distance, "minimum_prominence_noise_factor": args.peak_noise_factor, "argmax_fallback": False},
+        "peak_assessment": {
+            "start_distance": args.start_distance,
+            "threshold_mode": "fixed" if args.peak_prominence is not None else "adaptive_mad",
+            "fixed_minimum_prominence": args.peak_prominence,
+            "minimum_prominence_noise_factor": args.peak_noise_factor,
+            "argmax_fallback": False,
+        },
         "mrf": {
             label: {
                 "regularization": result.regularization,
@@ -534,8 +895,19 @@ def save_metadata(
         "normal_plot": {
             "method": args.plot_method,
             "mrf_regularization": args.plot_regularization if args.plot_method == "mrf" else None,
+            "denoise_tag": build_denoise_tag(
+                args.plot_method,
+                args.median_kernel,
+                args.gaussian_sigma,
+                args.plot_regularization,
+            ),
+            "line_count_tag": build_line_count_tag(args.profile_line_count, args.line_spacing),
             "file": "comparison_overview.png",
             "legacy_comparison_plot": args.comparison_plot,
+            "derivative_height_fraction": args.derivative_height_fraction,
+            "intensity_height_fraction": args.intensity_height_fraction,
+            "peak_threshold_mode": "fixed" if args.peak_prominence is not None else "adaptive_mad",
+            "fixed_peak_prominence": args.peak_prominence,
         },
         "significant_peaks": {name: [asdict(peak) for peak in method_peaks] for name, method_peaks in peaks.items()},
     }
@@ -571,9 +943,25 @@ def print_summary(output_dir: Path, metrics: list[dict[str, object]], peaks: dic
     print("Candidates are not classified as PD boundaries; no argmax fallback was used.")
 
 
-def build_output_directory(root: Path, dataset: str, image_path: Path, x: int) -> Path:
+def build_output_directory(
+    root: Path,
+    dataset: str,
+    image_path: Path,
+    x: int,
+    denoise_tag: str | None = None,
+    profile_line_count: int | None = None,
+    profile_line_spacing: float = DEFAULT_PROFILE_LINE_SPACING,
+    fixed_peak_prominence: float | None = None,
+) -> Path:
     safe_stem = re.sub(r"[^A-Za-z0-9_.-]+", "_", image_path.stem).strip("_")
-    return root / dataset / safe_stem / f"x{x}"
+    base_directory = root / dataset / safe_stem / f"x{x}"
+    if denoise_tag is not None:
+        base_directory /= denoise_tag
+    if profile_line_count is not None:
+        base_directory /= build_line_count_tag(profile_line_count, profile_line_spacing)
+    if fixed_peak_prominence is not None:
+        base_directory /= build_peak_threshold_tag(fixed_peak_prominence)
+    return base_directory
 
 
 if __name__ == "__main__":

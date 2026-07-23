@@ -1,4 +1,4 @@
-"""Run the isolated single-line Huber MRF comparison for every TIFF in a dataset."""
+"""Run the isolated parallel-line mean comparison for every TIFF in a dataset."""
 
 from __future__ import annotations
 
@@ -16,16 +16,27 @@ import numpy as np
 from tqdm import tqdm
 
 from compare_mrf_profile import (
+    DEFAULT_DERIVATIVE_HEIGHT_FRACTION,
+    DEFAULT_GAUSSIAN_SIGMA,
+    DEFAULT_INTENSITY_HEIGHT_FRACTION,
+    DEFAULT_MEDIAN_KERNEL,
     DEFAULT_PLOT_METHOD,
     DEFAULT_PLOT_REGULARIZATION,
+    DEFAULT_PROFILE_LINE_COUNT,
+    DEFAULT_PROFILE_LINE_SPACING,
     DEFAULT_REGULARIZATIONS,
     PLOT_METHODS,
+    build_denoise_tag,
+    build_line_count_tag,
+    build_peak_threshold_tag,
+    calculate_peak_prominence_threshold,
     calculate_metrics,
     comparison_plot_multi_method,
     find_significant_peaks,
     gaussian_filter,
-    load_vertical_line,
+    load_averaged_vertical_profile,
     median_filter,
+    parallel_line_offsets,
     select_plot_profile,
     simple_plot_single_method,
 )
@@ -38,9 +49,23 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument("--x", type=int, default=1000)
     parser.add_argument("--y-start", type=int, default=1400)
     parser.add_argument("--y-end", type=int, default=200)
+    parser.add_argument(
+        "--line-count",
+        "--profile-line-count",
+        dest="profile_line_count",
+        type=int,
+        default=DEFAULT_PROFILE_LINE_COUNT,
+        help="positive number of parallel Raw profiles averaged before denoising",
+    )
+    parser.add_argument(
+        "--line-spacing",
+        type=float,
+        default=DEFAULT_PROFILE_LINE_SPACING,
+        help="spacing between parallel profiles in pixels",
+    )
     parser.add_argument("--start-distance", type=int, default=50)
-    parser.add_argument("--median-kernel", type=int, default=5)
-    parser.add_argument("--gaussian-sigma", type=float, default=5.0)
+    parser.add_argument("--median-kernel", type=int, default=DEFAULT_MEDIAN_KERNEL)
+    parser.add_argument("--gaussian-sigma", type=float, default=DEFAULT_GAUSSIAN_SIGMA)
     parser.add_argument("--regularization", nargs="+", type=float, default=DEFAULT_REGULARIZATIONS)
     parser.add_argument("--plot-method", choices=PLOT_METHODS, default=DEFAULT_PLOT_METHOD)
     parser.add_argument("--plot-regularization", type=float, default=DEFAULT_PLOT_REGULARIZATION)
@@ -49,7 +74,22 @@ def parse_arguments() -> argparse.Namespace:
         action="store_true",
         help="also save the legacy five-panel multi-method plots",
     )
+    parser.add_argument(
+        "--derivative-height-fraction",
+        type=float,
+        default=DEFAULT_DERIVATIVE_HEIGHT_FRACTION,
+    )
+    parser.add_argument(
+        "--intensity-height-fraction",
+        type=float,
+        default=DEFAULT_INTENSITY_HEIGHT_FRACTION,
+    )
     parser.add_argument("--peak-noise-factor", type=float, default=5.0)
+    parser.add_argument(
+        "--peak-prominence",
+        type=float,
+        help="fixed minimum peak prominence; omitted keeps the existing adaptive MAD threshold",
+    )
     parser.add_argument("--output-root", type=Path, default=Path("mrf_comparison_batch"))
     parser.add_argument("--skip-individual-plots", action="store_true")
     return parser.parse_args()
@@ -61,7 +101,21 @@ def main() -> None:
     if not images:
         raise FileNotFoundError(f"no TIFF images found for {args.dataset}")
 
-    output_dir = args.output_root / args.dataset / f"x{args.x}"
+    denoise_tag = build_denoise_tag(
+        args.plot_method,
+        args.median_kernel,
+        args.gaussian_sigma,
+        args.plot_regularization,
+    )
+    output_dir = (
+        args.output_root
+        / args.dataset
+        / f"x{args.x}"
+        / denoise_tag
+        / build_line_count_tag(args.profile_line_count, args.line_spacing)
+    )
+    if args.peak_prominence is not None:
+        output_dir /= build_peak_threshold_tag(args.peak_prominence)
     individual_dir = output_dir / "individual_plots"
     comparison_dir = output_dir / "comparison_plots"
     profile_dir = output_dir / "profiles"
@@ -76,7 +130,14 @@ def main() -> None:
     run_records: list[dict[str, object]] = []
 
     for angle, image_index, image_path in tqdm(images, desc="MRF batch", unit="image"):
-        raw = load_vertical_line(image_path, args.x, args.y_start, args.y_end)
+        raw = load_averaged_vertical_profile(
+            image_path,
+            args.x,
+            args.y_start,
+            args.y_end,
+            args.profile_line_count,
+            args.line_spacing,
+        )
         median = median_filter(raw, args.median_kernel)
         gaussian = gaussian_filter(raw, args.gaussian_sigma)
         median_gaussian = gaussian_filter(median, args.gaussian_sigma)
@@ -102,17 +163,50 @@ def main() -> None:
             }
 
         derivatives = {name: np.gradient(profile) for name, profile in profiles.items()}
+        prominence_thresholds = {
+            name: calculate_peak_prominence_threshold(
+                np.abs(derivative),
+                args.start_distance,
+                args.peak_noise_factor,
+                args.peak_prominence,
+            )
+            for name, derivative in derivatives.items()
+        }
         peaks = {
-            name: find_significant_peaks(np.abs(derivative), args.start_distance, args.peak_noise_factor)
+            name: find_significant_peaks(
+                np.abs(derivative),
+                args.start_distance,
+                args.peak_noise_factor,
+                args.peak_prominence,
+            )
             for name, derivative in derivatives.items()
         }
         metrics = calculate_metrics(profiles, derivatives, peaks, args.start_distance)
         for row in metrics:
-            aggregate_metrics.append({"angle_deg": angle, "image_index": image_index, "image": image_path.name, **row})
+            aggregate_metrics.append(
+                {
+                    "profile_line_count": args.profile_line_count,
+                    "profile_line_spacing_pixels": args.line_spacing,
+                    "sampling_width_pixels": (args.profile_line_count - 1) * args.line_spacing,
+                    "line_aggregation": "mean",
+                    "peak_threshold_mode": "fixed" if args.peak_prominence is not None else "adaptive_mad",
+                    "peak_prominence_threshold": prominence_thresholds[row["method"]],
+                    "angle_deg": angle,
+                    "image_index": image_index,
+                    "image": image_path.name,
+                    **row,
+                }
+            )
         for name, profile in profiles.items():
             all_profiles.setdefault(name, []).append(profile)
 
-        save_compact_profiles(profile_dir / f"angle_{angle:03d}.csv", profiles, derivatives)
+        save_compact_profiles(
+            profile_dir / f"angle_{angle:03d}.csv",
+            profiles,
+            derivatives,
+            args.profile_line_count,
+            args.line_spacing,
+        )
         if not args.skip_individual_plots:
             denoised_profile, denoise_label, title_method, analysis_name = select_plot_profile(
                 args.plot_method,
@@ -126,7 +220,10 @@ def main() -> None:
             selected_peaks = peaks.get(analysis_name)
             if selected_peaks is None:
                 selected_peaks = find_significant_peaks(
-                    np.abs(denoised_derivative), args.start_distance, args.peak_noise_factor
+                    np.abs(denoised_derivative),
+                    args.start_distance,
+                    args.peak_noise_factor,
+                    args.peak_prominence,
                 )
             simple_plot_single_method(
                 individual_dir / f"angle_{angle:03d}.png",
@@ -138,6 +235,10 @@ def main() -> None:
                 denoise_label,
                 title_method,
                 image_path.stem,
+                derivative_height_fraction=args.derivative_height_fraction,
+                intensity_height_fraction=args.intensity_height_fraction,
+                profile_line_count=args.profile_line_count,
+                profile_line_spacing=args.line_spacing,
             )
             if args.comparison_plots:
                 comparison_plot_multi_method(
@@ -146,6 +247,7 @@ def main() -> None:
                     derivatives,
                     peaks,
                     args.start_distance,
+                    args.profile_line_count,
                 )
         run_records.append(
             {
@@ -160,7 +262,13 @@ def main() -> None:
     matrices = {name: np.vstack(profile_list) for name, profile_list in all_profiles.items()}
     angles = np.array([item[0] for item in images])
     save_metrics(output_dir / "metrics_all_images.csv", aggregate_metrics)
-    save_profile_archive(output_dir / "profiles_all_images.npz", angles, matrices)
+    save_profile_archive(
+        output_dir / "profiles_all_images.npz",
+        angles,
+        matrices,
+        args.profile_line_count,
+        args.line_spacing,
+    )
     summary = summarize_metrics(aggregate_metrics)
     save_metrics(output_dir / "summary_by_method.csv", summary)
     comparison = compare_with_median_gaussian(aggregate_metrics)
@@ -171,20 +279,36 @@ def main() -> None:
         save_summary_plot(output_dir / "summary_metrics_by_angle.png", aggregate_metrics)
 
     metadata = {
-        "scope": "all TIFFs, one vertical line per image; candidates are not PD classifications",
+        "scope": "all TIFFs, one averaged parallel-line profile per image; candidates are not PD classifications",
         "dataset": args.dataset,
         "image_count": len(images),
         "angles_deg": angles.tolist(),
         "line": {"x": args.x, "y_start": args.y_start, "y_end": args.y_end},
+        "profile_sampling": {
+            "line_count": args.profile_line_count,
+            "line_aggregation": "mean",
+            "line_spacing_pixels": args.line_spacing,
+            "sampling_width_pixels": (args.profile_line_count - 1) * args.line_spacing,
+            "line_count_tag": build_line_count_tag(args.profile_line_count, args.line_spacing),
+            "x_offsets_pixels": parallel_line_offsets(args.profile_line_count, args.line_spacing).tolist(),
+            "even_line_interpolation": "linear_x",
+        },
         "median_gaussian": {"median_kernel": args.median_kernel, "gaussian_sigma": args.gaussian_sigma},
         "mrf_regularization": list(args.regularization),
         "normal_plot": {
             "method": args.plot_method,
             "mrf_regularization": args.plot_regularization if args.plot_method == "mrf" else None,
+            "denoise_tag": denoise_tag,
             "legacy_comparison_plots": args.comparison_plots,
+            "derivative_height_fraction": args.derivative_height_fraction,
+            "intensity_height_fraction": args.intensity_height_fraction,
+            "peak_threshold_mode": "fixed" if args.peak_prominence is not None else "adaptive_mad",
+            "fixed_peak_prominence": args.peak_prominence,
         },
         "start_distance": args.start_distance,
         "peak_noise_factor": args.peak_noise_factor,
+        "peak_threshold_mode": "fixed" if args.peak_prominence is not None else "adaptive_mad",
+        "fixed_peak_prominence": args.peak_prominence,
         "argmax_fallback": False,
         "runs": run_records,
     }
@@ -201,13 +325,19 @@ def sorted_dataset_images(dataset_dir: Path) -> list[tuple[int, int, Path]]:
     return sorted(records, key=lambda item: (item[0], item[1]))
 
 
-def save_compact_profiles(path: Path, profiles: dict[str, np.ndarray], derivatives: dict[str, np.ndarray]) -> None:
+def save_compact_profiles(
+    path: Path,
+    profiles: dict[str, np.ndarray],
+    derivatives: dict[str, np.ndarray],
+    profile_line_count: int = DEFAULT_PROFILE_LINE_COUNT,
+    profile_line_spacing: float = DEFAULT_PROFILE_LINE_SPACING,
+) -> None:
     names = list(profiles)
     with path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.writer(handle)
-        writer.writerow(["distance", *names, *(f"derivative:{name}" for name in names)])
+        writer.writerow(["profile_line_count", "profile_line_spacing_pixels", "sampling_width_pixels", "line_aggregation", "distance", *names, *(f"derivative:{name}" for name in names)])
         for index in range(len(next(iter(profiles.values())))):
-            writer.writerow([index, *(profiles[name][index] for name in names), *(derivatives[name][index] for name in names)])
+            writer.writerow([profile_line_count, profile_line_spacing, (profile_line_count - 1) * profile_line_spacing, "mean", index, *(profiles[name][index] for name in names), *(derivatives[name][index] for name in names)])
 
 
 def save_metrics(path: Path, rows: list[dict[str, object]]) -> None:
@@ -217,8 +347,20 @@ def save_metrics(path: Path, rows: list[dict[str, object]]) -> None:
         writer.writerows(rows)
 
 
-def save_profile_archive(path: Path, angles: np.ndarray, matrices: dict[str, np.ndarray]) -> None:
-    arrays = {"angles_deg": angles}
+def save_profile_archive(
+    path: Path,
+    angles: np.ndarray,
+    matrices: dict[str, np.ndarray],
+    profile_line_count: int = DEFAULT_PROFILE_LINE_COUNT,
+    profile_line_spacing: float = DEFAULT_PROFILE_LINE_SPACING,
+) -> None:
+    arrays = {
+        "angles_deg": angles,
+        "profile_line_count": np.asarray(profile_line_count),
+        "profile_line_spacing_pixels": np.asarray(profile_line_spacing),
+        "sampling_width_pixels": np.asarray((profile_line_count - 1) * profile_line_spacing),
+        "line_aggregation": np.asarray("mean"),
+    }
     for name, matrix in matrices.items():
         key = re.sub(r"[^A-Za-z0-9]+", "_", name).strip("_").lower()
         arrays[key] = matrix
@@ -274,6 +416,12 @@ def summarize_metrics(rows: list[dict[str, object]]) -> list[dict[str, object]]:
         positions = [float(row["major_candidate_position"]) for row in selected if row["major_candidate_position"] != ""]
         summary.append(
             {
+                "profile_line_count": selected[0].get("profile_line_count", DEFAULT_PROFILE_LINE_COUNT),
+                "profile_line_spacing_pixels": selected[0].get("profile_line_spacing_pixels", DEFAULT_PROFILE_LINE_SPACING),
+                "sampling_width_pixels": selected[0].get("sampling_width_pixels", 0.0),
+                "line_aggregation": selected[0].get("line_aggregation", "mean"),
+                "peak_threshold_mode": selected[0].get("peak_threshold_mode", "adaptive_mad"),
+                "peak_prominence_threshold_median": float(np.median([float(row.get("peak_prominence_threshold", 0.0)) for row in selected])),
                 "method": method,
                 "images": len(selected),
                 "noise_mad_median": float(np.median(noise)),
@@ -309,6 +457,11 @@ def compare_with_median_gaussian(rows: list[dict[str, object]]) -> list[dict[str
         values = np.asarray(differences, dtype=float)
         comparison.append(
             {
+                "profile_line_count": rows[0].get("profile_line_count", DEFAULT_PROFILE_LINE_COUNT),
+                "profile_line_spacing_pixels": rows[0].get("profile_line_spacing_pixels", DEFAULT_PROFILE_LINE_SPACING),
+                "sampling_width_pixels": rows[0].get("sampling_width_pixels", 0.0),
+                "line_aggregation": rows[0].get("line_aggregation", "mean"),
+                "peak_threshold_mode": rows[0].get("peak_threshold_mode", "adaptive_mad"),
                 "method": method,
                 "comparable_images": int(values.size),
                 "median_absolute_candidate_shift_px": "" if not values.size else float(np.median(values)),
