@@ -79,6 +79,11 @@
     1.0,
     10.0
   ],
+  "normal_plot": {
+    "method": "mrf",
+    "mrf_regularization": 10.0,
+    "legacy_comparison_plots": false
+  },
   "start_distance": 50,
   "peak_noise_factor": 5.0,
   "argmax_fallback": false,

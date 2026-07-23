@@ -16,13 +16,18 @@ import numpy as np
 from tqdm import tqdm
 
 from compare_mrf_profile import (
+    DEFAULT_PLOT_METHOD,
+    DEFAULT_PLOT_REGULARIZATION,
     DEFAULT_REGULARIZATIONS,
+    PLOT_METHODS,
     calculate_metrics,
+    comparison_plot_multi_method,
     find_significant_peaks,
     gaussian_filter,
     load_vertical_line,
     median_filter,
-    save_figure,
+    select_plot_profile,
+    simple_plot_single_method,
 )
 from src.mrf import huber_mrf_denoise
 
@@ -37,6 +42,13 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument("--median-kernel", type=int, default=5)
     parser.add_argument("--gaussian-sigma", type=float, default=5.0)
     parser.add_argument("--regularization", nargs="+", type=float, default=DEFAULT_REGULARIZATIONS)
+    parser.add_argument("--plot-method", choices=PLOT_METHODS, default=DEFAULT_PLOT_METHOD)
+    parser.add_argument("--plot-regularization", type=float, default=DEFAULT_PLOT_REGULARIZATION)
+    parser.add_argument(
+        "--comparison-plots",
+        action="store_true",
+        help="also save the legacy five-panel multi-method plots",
+    )
     parser.add_argument("--peak-noise-factor", type=float, default=5.0)
     parser.add_argument("--output-root", type=Path, default=Path("mrf_comparison_batch"))
     parser.add_argument("--skip-individual-plots", action="store_true")
@@ -51,9 +63,12 @@ def main() -> None:
 
     output_dir = args.output_root / args.dataset / f"x{args.x}"
     individual_dir = output_dir / "individual_plots"
+    comparison_dir = output_dir / "comparison_plots"
     profile_dir = output_dir / "profiles"
     output_dir.mkdir(parents=True, exist_ok=True)
     individual_dir.mkdir(exist_ok=True)
+    if args.comparison_plots:
+        comparison_dir.mkdir(exist_ok=True)
     profile_dir.mkdir(exist_ok=True)
 
     all_profiles: dict[str, list[np.ndarray]] = {}
@@ -62,13 +77,20 @@ def main() -> None:
 
     for angle, image_index, image_path in tqdm(images, desc="MRF batch", unit="image"):
         raw = load_vertical_line(image_path, args.x, args.y_start, args.y_end)
-        median_gaussian = gaussian_filter(median_filter(raw, args.median_kernel), args.gaussian_sigma)
+        median = median_filter(raw, args.median_kernel)
+        gaussian = gaussian_filter(raw, args.gaussian_sigma)
+        median_gaussian = gaussian_filter(median, args.gaussian_sigma)
         profiles = {"Raw": raw, "Median+Gaussian": median_gaussian}
         mrf_diagnostics: dict[str, dict[str, object]] = {}
-        for regularization in args.regularization:
+        regularizations = list(args.regularization)
+        if args.plot_method == "mrf" and args.plot_regularization not in regularizations:
+            regularizations.append(args.plot_regularization)
+        mrf_results = {}
+        for regularization in regularizations:
             label = f"Huber MRF lambda={regularization:g}"
             result = huber_mrf_denoise(raw, regularization=regularization)
             profiles[label] = result.profile
+            mrf_results[label] = result
             mrf_diagnostics[label] = {
                 "lambda": regularization,
                 "huber_delta_normalized": result.huber_delta,
@@ -92,7 +114,39 @@ def main() -> None:
 
         save_compact_profiles(profile_dir / f"angle_{angle:03d}.csv", profiles, derivatives)
         if not args.skip_individual_plots:
-            save_figure(individual_dir / f"angle_{angle:03d}.png", profiles, derivatives, peaks, args.start_distance)
+            denoised_profile, denoise_label, title_method, analysis_name = select_plot_profile(
+                args.plot_method,
+                args.plot_regularization,
+                median,
+                gaussian,
+                median_gaussian,
+                mrf_results,
+            )
+            denoised_derivative = np.gradient(denoised_profile)
+            selected_peaks = peaks.get(analysis_name)
+            if selected_peaks is None:
+                selected_peaks = find_significant_peaks(
+                    np.abs(denoised_derivative), args.start_distance, args.peak_noise_factor
+                )
+            simple_plot_single_method(
+                individual_dir / f"angle_{angle:03d}.png",
+                raw,
+                denoised_profile,
+                denoised_derivative,
+                selected_peaks,
+                args.start_distance,
+                denoise_label,
+                title_method,
+                image_path.stem,
+            )
+            if args.comparison_plots:
+                comparison_plot_multi_method(
+                    comparison_dir / f"angle_{angle:03d}.png",
+                    profiles,
+                    derivatives,
+                    peaks,
+                    args.start_distance,
+                )
         run_records.append(
             {
                 "angle_deg": angle,
@@ -107,13 +161,14 @@ def main() -> None:
     angles = np.array([item[0] for item in images])
     save_metrics(output_dir / "metrics_all_images.csv", aggregate_metrics)
     save_profile_archive(output_dir / "profiles_all_images.npz", angles, matrices)
-    save_heatmaps(output_dir / "all_angles_profile_heatmaps.png", angles, matrices, args.start_distance)
-    save_derivative_heatmaps(output_dir / "all_angles_abs_derivative_heatmaps.png", angles, matrices, args.start_distance)
     summary = summarize_metrics(aggregate_metrics)
     save_metrics(output_dir / "summary_by_method.csv", summary)
     comparison = compare_with_median_gaussian(aggregate_metrics)
     save_metrics(output_dir / "comparison_to_median_gaussian.csv", comparison)
-    save_summary_plot(output_dir / "summary_metrics_by_angle.png", aggregate_metrics)
+    if args.comparison_plots:
+        save_heatmaps(output_dir / "all_angles_profile_heatmaps.png", angles, matrices, args.start_distance)
+        save_derivative_heatmaps(output_dir / "all_angles_abs_derivative_heatmaps.png", angles, matrices, args.start_distance)
+        save_summary_plot(output_dir / "summary_metrics_by_angle.png", aggregate_metrics)
 
     metadata = {
         "scope": "all TIFFs, one vertical line per image; candidates are not PD classifications",
@@ -123,6 +178,11 @@ def main() -> None:
         "line": {"x": args.x, "y_start": args.y_start, "y_end": args.y_end},
         "median_gaussian": {"median_kernel": args.median_kernel, "gaussian_sigma": args.gaussian_sigma},
         "mrf_regularization": list(args.regularization),
+        "normal_plot": {
+            "method": args.plot_method,
+            "mrf_regularization": args.plot_regularization if args.plot_method == "mrf" else None,
+            "legacy_comparison_plots": args.comparison_plots,
+        },
         "start_distance": args.start_distance,
         "peak_noise_factor": args.peak_noise_factor,
         "argmax_fallback": False,
@@ -278,9 +338,10 @@ def save_summary_plot(path: Path, rows: list[dict[str, object]]) -> None:
     axes[1].set_title("Significant candidate position by angle (not a PD classification)")
     axes[1].set_ylabel("Distance (pixels)")
     for axis in axes:
-        axis.set_xlabel("Angle (deg)")
+        axis.set_xlabel("Angle (deg)", fontsize=14)
+        axis.tick_params(axis="both", labelsize=12)
         axis.grid(alpha=0.25)
-        axis.legend(fontsize=8)
+        axis.legend(fontsize=12, framealpha=0.95)
     figure.savefig(path, dpi=180)
     plt.close(figure)
 
