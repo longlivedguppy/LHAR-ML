@@ -7,8 +7,9 @@ import matplotlib.pyplot as plt
 # srcフォルダ内の自作モジュールから関数をインポート
 from src.data_loader import extract_multi_line_profile
 from src.denoise import apply_smoothing_filter, apply_median_filter, apply_median_gaussian_filter
+from src.pd_detection import detect_pd_candidate
 # 2D行列のフィルタリングにScipy関数を直接使用
-from scipy.signal import medfilt, find_peaks
+from scipy.signal import medfilt
 from scipy.ndimage import gaussian_filter1d
 from tqdm import tqdm
 
@@ -341,32 +342,19 @@ def main():
                 deriv_csv_path = os.path.join(path_structure["1d_average"]["data"], "derivative", f"deriv_{f_name}_{base_filename}.csv")
                 deriv_plot_path = os.path.join(path_structure["1d_average"]["plots"], "derivative", f"deriv_{f_name}_{base_filename}.png")
                 
-                derivative = np.gradient(intensities)
-                abs_derivative = np.abs(derivative)
+                detection = detect_pd_candidate(
+                    intensities,
+                    start_distance=START_DISTANCE,
+                    peak_distance=15,
+                )
+                derivative = detection.derivative
+                abs_derivative = detection.absolute_derivative
                 distance = np.arange(len(intensities))
-                
-                # --- START_DISTANCE未満のデータをクリップ（ピーク探索から除外） ---
-                abs_derivative_clipped = abs_derivative.copy()
-                abs_derivative_clipped[:START_DISTANCE] = 0
-                
-                # scipy.signal.find_peaks を用いて独立した上位2つのピークを取得
-                peaks, properties = find_peaks(abs_derivative_clipped, height=0, distance=15)
-                if len(peaks) >= 2:
-                    sorted_idx = np.argsort(properties['peak_heights'])[::-1]
-                    p1_x = peaks[sorted_idx[0]]
-                    p1_v = properties['peak_heights'][sorted_idx[0]]
-                    p2_x = peaks[sorted_idx[1]]
-                    p2_v = properties['peak_heights'][sorted_idx[1]]
-                elif len(peaks) == 1:
-                    p1_x = peaks[0]
-                    p1_v = properties['peak_heights'][0]
-                    p2_x = p1_x
-                    p2_v = 0
-                else:
-                    p1_x = np.argmax(abs_derivative_clipped)
-                    p1_v = abs_derivative[p1_x]
-                    p2_x = p1_x
-                    p2_v = 0
+
+                p1_x = detection.primary.position
+                p1_v = detection.primary.height
+                p2_x = detection.secondary.position
+                p2_v = detection.secondary.height
                 
                 # 個別プロット用は1stピークを使用
                 best_peak_idx = p1_x

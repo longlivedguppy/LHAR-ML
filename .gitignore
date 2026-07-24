@@ -7,6 +7,11 @@ mrf_comparison_batch/
 output_plots/
 data/processed/
 data/enhanced/
+experiments/pd_detection_limit/data/synthetic/**
+!experiments/pd_detection_limit/data/synthetic/.gitkeep
+experiments/pd_detection_limit/outputs/**
+!experiments/pd_detection_limit/outputs/**/
+!experiments/pd_detection_limit/outputs/**/.gitkeep
 
 # Common generated image outputs
 *.png

@@ -2,6 +2,21 @@ import pandas as pd
 from scipy.ndimage import gaussian_filter1d
 from scipy.signal import medfilt
 
+
+def median_gaussian_filter(data, kernel_size=5, sigma=5):
+    """Apply the production Median + Gaussian algorithm without file output.
+
+    The existing production wrapper below also uses this function so synthetic
+    and measured profiles cannot silently diverge to separate implementations.
+    Even median kernels retain the existing behavior of being advanced to the
+    next odd integer.
+    """
+    if kernel_size % 2 == 0:
+        kernel_size += 1
+
+    median_smoothed = medfilt(data, kernel_size=kernel_size)
+    return gaussian_filter1d(median_smoothed, sigma=sigma)
+
 def apply_smoothing_filter(data, output_csv_path, method="gaussian"):
     """データのガタガタ（ノイズ）を滑らかにして保存する"""
     if method == "gaussian":
@@ -35,7 +50,7 @@ def apply_median_gaussian_filter(data, output_csv_path, kernel_size=5, sigma=5):
     # 1. メディアンフィルタの適用
     median_smoothed = medfilt(data, kernel_size=kernel_size)
     # 2. ガウシアンフィルタの重ね掛け
-    gaussian_smoothed = gaussian_filter1d(median_smoothed, sigma=sigma)
+    gaussian_smoothed = median_gaussian_filter(data, kernel_size=kernel_size, sigma=sigma)
     
     df = pd.DataFrame({"Raw_Intensity": data, "Median_Intensity": median_smoothed, "Median_Gaussian_Intensity": gaussian_smoothed})
     df.to_csv(output_csv_path, index=False)
